@@ -4,1232 +4,536 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blackbeard</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-  :root {
-    --black: #0a0a0a;
-    --charcoal: #1a1a1a;
-    --dark: #242424;
-    --border: #2e2e2e;
-    --mid: #3a3a3a;
-    --muted: #666;
-    --text: #e8e8e8;
-    --text-dim: #999;
-    --accent: #c8a96e;
-    --accent-dim: #8a7248;
-    --red: #d04040;
-    --green: #3a9a5c;
-    --blue: #4a7fb5;
-    --radius: 8px;
-    --font: 'Inter', system-ui, -apple-system, sans-serif;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--black);
-    color: var(--text);
-    font-family: var(--font);
-    font-size: 14px;
-    min-height: 100vh;
-  }
-  /* ── Auth ── */
-  #auth-screen {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    flex-direction: column;
-    gap: 32px;
-  }
-  .auth-card {
-    background: var(--charcoal);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 40px;
-    width: 360px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  .auth-logo {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    color: var(--accent);
-    text-align: center;
-  }
-  .auth-subtitle { color: var(--text-dim); font-size: 13px; text-align: center; }
-  input[type=email] {
-    width: 100%;
-    background: var(--dark);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    padding: 10px 14px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  input[type=email]:focus { border-color: var(--accent); }
-  .btn {
-    background: var(--accent);
-    color: #000;
-    border: none;
-    border-radius: var(--radius);
-    padding: 10px 18px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.15s;
-    white-space: nowrap;
-  }
-  .btn:hover { opacity: 0.88; }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-ghost {
-    background: var(--dark);
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
-  .btn-ghost:hover { border-color: var(--mid); }
-  .btn-sm { padding: 7px 14px; font-size: 13px; }
-  .btn-danger { background: var(--red); color: #fff; }
-  .divider {
-    display: flex; align-items: center; gap: 12px;
-    color: var(--text-dim); font-size: 12px;
-  }
-  .divider::before, .divider::after {
-    content: ''; flex: 1; height: 1px; background: var(--border);
-  }
-  /* ── App shell ── */
-  #app { display: none; min-height: 100vh; flex-direction: column; }
-  .topbar {
-    background: var(--charcoal);
-    border-bottom: 1px solid var(--border);
-    padding: 0 20px;
-    height: 52px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky; top: 0; z-index: 100;
-  }
-  .topbar-logo {
-    font-size: 16px; font-weight: 700; letter-spacing: 3px; color: var(--accent);
-  }
-  .topbar-right { display: flex; align-items: center; gap: 12px; }
-  .user-badge {
-    background: var(--dark);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 12px;
-    color: var(--text-dim);
-  }
-  /* ── Nav tabs ── */
-  .nav-tabs {
-    background: var(--charcoal);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    padding: 0 20px;
-    gap: 2px;
-  }
-  .nav-tab {
-    padding: 12px 16px;
-    font-size: 13px;
-    color: var(--text-dim);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: color 0.15s, border-color 0.15s;
-    background: none;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-  }
-  .nav-tab:hover { color: var(--text); }
-  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-  /* ── Content panels ── */
-  .panel { display: none; padding: 24px 20px; max-width: 900px; }
-  .panel.active { display: block; }
-  /* ── Upload zone ── */
-  .upload-zone {
-    border: 2px dashed var(--border);
-    border-radius: 12px;
-    padding: 40px;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-    position: relative;
-  }
-  .upload-zone:hover, .upload-zone.drag-over {
-    border-color: var(--accent);
-    background: rgba(200,169,110,0.04);
-  }
-  .upload-zone input[type=file] {
-    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-  }
-  .upload-icon { font-size: 36px; margin-bottom: 12px; }
-  .upload-hint { color: var(--text-dim); font-size: 13px; margin-top: 8px; }
-  .upload-types {
-    display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap;
-  }
-  .type-badge {
-    background: var(--dark);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 2px 8px;
-    font-size: 11px;
-    color: var(--text-dim);
-  }
-  /* ── File queue ── */
-  .file-queue { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
-  .file-item {
-    background: var(--charcoal);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .file-item.error { border-color: var(--red); }
-  .file-item.done { border-color: var(--green); }
-  .file-item.processing { border-color: var(--accent-dim); }
-  .file-icon { font-size: 20px; flex-shrink: 0; }
-  .file-info { flex: 1; min-width: 0; }
-  .file-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .file-status { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
-  .file-status.error { color: var(--red); }
-  .file-status.done { color: var(--green); }
-  .file-remove {
-    background: none; border: none; color: var(--muted);
-    cursor: pointer; font-size: 16px; padding: 4px; flex-shrink: 0;
-  }
-  .file-remove:hover { color: var(--red); }
-  /* ── Paste textarea ── */
-  .paste-area {
-    width: 100%;
-    background: var(--dark);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    padding: 14px;
-    font-family: 'Mono', monospace;
-    font-size: 12px;
-    resize: vertical;
-    min-height: 160px;
-    outline: none;
-    transition: border-color 0.2s;
-    line-height: 1.5;
-  }
-  .paste-area:focus { border-color: var(--accent); }
-  /* ── Tab switcher ── */
-  .tab-switcher {
-    display: flex;
-    background: var(--dark);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 3px;
-    gap: 2px;
-    width: fit-content;
-    margin-bottom: 16px;
-  }
-  .tab-switch {
-    padding: 6px 16px;
-    border-radius: 5px;
-    font-size: 13px;
-    cursor: pointer;
-    border: none;
-    background: none;
-    color: var(--text-dim);
-    transition: background 0.15s, color 0.15s;
-  }
-  .tab-switch.active { background: var(--charcoal); color: var(--text); }
-  /* ── Notes / instructions ── */
-  .notes-section { margin-top: 16px; }
-  .section-label {
-    font-size: 11px; font-weight: 600; letter-spacing: 1px;
-    color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px;
-  }
-  .notes-input {
-    width: 100%;
-    background: var(--dark);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    padding: 10px 14px;
-    font-size: 13px;
-    outline: none;
-    resize: vertical;
-    min-height: 80px;
-    transition: border-color 0.2s;
-  }
-  .notes-input:focus { border-color: var(--accent); }
-  .quick-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .quick-tag {
-    background: var(--dark); border: 1px solid var(--border);
-    border-radius: 4px; padding: 4px 10px; font-size: 12px;
-    cursor: pointer; color: var(--text-dim);
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
-  }
-  .quick-tag:hover { border-color: var(--accent-dim); color: var(--text); }
-  .quick-tag.selected { background: var(--accent-dim); border-color: var(--accent); color: var(--text); }
-  /* ── Actions ── */
-  .action-row { display: flex; gap: 10px; margin-top: 20px; align-items: center; flex-wrap: wrap; }
-  /* ── Progress / status ── */
-  .status-box {
-    background: var(--dark);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    margin-top: 16px;
-    font-size: 13px;
-    line-height: 1.6;
-    display: none;
-  }
-  .status-box.visible { display: block; }
-  .status-step {
-    display: flex; align-items: flex-start; gap: 10px; padding: 3px 0;
-  }
-  .step-icon { flex-shrink: 0; width: 18px; text-align: center; }
-  .step-done .step-icon::before { content: '✓'; color: var(--green); }
-  .step-active .step-icon::before { content: '⟳'; color: var(--accent); }
-  .step-error .step-icon::before { content: '✗'; color: var(--red); }
-  .step-wait .step-icon::before { content: '·'; color: var(--muted); }
-  /* ── Result area ── */
-  .result-area { margin-top: 20px; display: none; }
-  .result-area.visible { display: block; }
-  .result-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 12px;
-  }
-  .result-title { font-weight: 600; font-size: 15px; }
-  .result-actions { display: flex; gap: 8px; }
-  .result-content {
-    background: var(--charcoal);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    font-size: 13px;
-    line-height: 1.7;
-    white-space: pre-wrap;
-    max-height: 500px;
-    overflow-y: auto;
-  }
-  /* ── Tables in result ── */
-  .result-content table {
-    width: 100%; border-collapse: collapse; margin: 12px 0;
-  }
-  .result-content th {
-    background: var(--dark); padding: 8px 12px; text-align: left;
-    font-size: 12px; color: var(--text-dim); border-bottom: 1px solid var(--border);
-  }
-  .result-content td {
-    padding: 7px 12px; border-bottom: 1px solid var(--border); font-size: 13px;
-  }
-  .result-content tr:last-child td { border-bottom: none; }
-  /* ── History ── */
-  .history-list { display: flex; flex-direction: column; gap: 10px; }
-  .history-card {
-    background: var(--charcoal);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    cursor: pointer;
-    transition: border-color 0.15s;
-  }
-  .history-card:hover { border-color: var(--accent-dim); }
-  .history-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-  .history-date { font-size: 12px; color: var(--text-dim); }
-  .history-user { font-size: 12px; color: var(--accent); }
-  .history-files { font-size: 12px; color: var(--text-dim); }
-  .history-preview {
-    font-size: 13px; color: var(--text); 
-    overflow: hidden; text-overflow: ellipsis;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-  }
-  /* ── Leaderboard ── */
-  .lb-table { width: 100%; border-collapse: collapse; }
-  .lb-table th {
-    text-align: left; padding: 10px 14px; font-size: 12px;
-    color: var(--text-dim); border-bottom: 1px solid var(--border);
-    font-weight: 600; letter-spacing: 0.5px;
-  }
-  .lb-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
-  .lb-rank { color: var(--accent); font-weight: 700; width: 40px; }
-  /* ── CSV output section ── */
-  .csv-section { margin-top: 16px; }
-  .csv-tabs { display: flex; gap: 2px; margin-bottom: 0; }
-  .csv-tab {
-    padding: 8px 16px; background: var(--dark); border: 1px solid var(--border);
-    border-bottom: none; border-radius: 6px 6px 0 0; font-size: 12px;
-    cursor: pointer; color: var(--text-dim); transition: background 0.15s, color 0.15s;
-  }
-  .csv-tab.active { background: var(--charcoal); color: var(--text); border-color: var(--border); }
-  .csv-content {
-    background: var(--charcoal); border: 1px solid var(--border);
-    border-radius: 0 var(--radius) var(--radius) var(--radius);
-    padding: 0;
-    overflow: hidden;
-  }
-  .csv-pane { display: none; }
-  .csv-pane.active { display: block; }
-  .csv-toolbar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 14px; background: var(--dark); border-bottom: 1px solid var(--border);
-  }
-  .csv-rows {
-    font-family: monospace; font-size: 12px; line-height: 1.6;
-    padding: 14px; overflow-x: auto; max-height: 280px; overflow-y: auto;
-    white-space: pre;
-  }
-  /* ── Empty state ── */
-  .empty-state {
-    text-align: center; padding: 60px 20px; color: var(--text-dim);
-  }
-  .empty-state-icon { font-size: 40px; margin-bottom: 12px; }
-  .empty-state p { font-size: 13px; }
-  /* ── Progress bar ── */
-  .progress-bar-wrap {
-    height: 3px; background: var(--border); border-radius: 2px;
-    margin-top: 8px; overflow: hidden; display: none;
-  }
-  .progress-bar-wrap.visible { display: block; }
-  .progress-bar {
-    height: 100%; background: var(--accent);
-    border-radius: 2px; width: 0%;
-    transition: width 0.3s;
-  }
-  /* ── Toast ── */
-  #toast {
-    position: fixed; bottom: 24px; right: 24px;
-    background: var(--charcoal); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 12px 18px;
-    font-size: 13px; color: var(--text);
-    opacity: 0; transform: translateY(8px);
-    transition: opacity 0.2s, transform 0.2s;
-    z-index: 9999; pointer-events: none; max-width: 320px;
-  }
-  #toast.show { opacity: 1; transform: translateY(0); }
-  #toast.error { border-color: var(--red); }
-  #toast.success { border-color: var(--green); }
-  /* ── Loading spinner ── */
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .spinner {
-    display: inline-block; width: 14px; height: 14px;
-    border: 2px solid var(--border); border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    vertical-align: middle;
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#383d4f;--navy2:#4a5168;--navy3:#2a2f3d;
+  --gold:#bab28f;--gold2:#d4ccaa;--gold3:#9a9275;
+  --light:#f5f5f5;--white:#fff;--text:#383d4f;--muted:#888;--border:#e2e2de;
+  --green:#2a7a4a;--blue:#2d5a8e;--amber:#b8860b;
+  --font:'Montserrat',Arial,sans-serif;--r:6px;--rl:10px;
+}
+body{font-family:var(--font);background:var(--light);color:var(--text);min-height:100vh;font-size:14px}
+#auth{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--navy3)}
+.auth-card{background:var(--white);border-radius:var(--rl);box-shadow:0 20px 60px rgba(0,0,0,.4);width:100%;max-width:380px;overflow:hidden}
+.auth-top{background:var(--navy);padding:2rem;text-align:center;position:relative;overflow:hidden}
+.auth-top::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,rgba(186,178,143,.12) 0,rgba(186,178,143,.12) 1px,transparent 0,transparent 50%);background-size:8px 8px}
+.auth-title{font-size:1.8rem;font-weight:700;color:var(--white);letter-spacing:.08em;text-transform:uppercase;position:relative}
+.auth-title span{color:var(--gold)}
+.auth-bar{height:3px;background:linear-gradient(90deg,var(--gold3),var(--gold2),var(--gold3))}
+.auth-body{padding:1.75rem 2rem 2rem}
+.auth-sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:1.25rem}
+.auth-input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:13px;color:var(--text);outline:none;margin-bottom:10px}
+.auth-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(186,178,143,.15)}
+.auth-btn{width:100%;padding:11px;background:var(--navy);border:none;border-radius:var(--r);color:var(--white);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.03em;transition:background .15s}
+.auth-btn:hover{background:var(--navy2)}
+.auth-btn:disabled{opacity:.5;cursor:not-allowed}
+.auth-msg{margin-top:10px;font-size:12px;text-align:center;color:var(--muted);min-height:18px}
+.auth-msg.ok{color:var(--green)}.auth-msg.err{color:#c0392b}
+.auth-or{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--muted);font-size:11px}
+.auth-or::before,.auth-or::after{content:'';flex:1;height:1px;background:var(--border)}
+.ms-btn{width:100%;padding:10px;background:var(--white);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:border-color .15s}
+.ms-btn:hover{border-color:var(--navy)}
+.ms-icon{width:16px;height:16px;display:grid;grid-template-columns:1fr 1fr;gap:1.5px}
+.ms-icon span{display:block;border-radius:1px}
+#app{display:none;flex-direction:column;min-height:100vh}
+.bar{background:var(--navy);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100}
+.bar-title{font-size:15px;font-weight:700;color:var(--white);letter-spacing:.08em;text-transform:uppercase}
+.bar-title span{color:var(--gold)}
+.bar-right{display:flex;align-items:center;gap:10px}
+.user-pill{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:3px 11px 3px 3px;font-size:11px;color:rgba(255,255,255,.8)}
+.user-av{width:24px;height:24px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--navy)}
+.out-btn{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.55);font-family:var(--font);font-size:11px;cursor:pointer;padding:4px 9px;border-radius:4px}
+.out-btn:hover{color:var(--white);border-color:rgba(255,255,255,.4)}
+.gold-bar{height:3px;background:linear-gradient(90deg,var(--gold3),var(--gold2),var(--gold3))}
+.main{flex:1;padding:1.5rem;max-width:1400px;width:100%;margin:0 auto}
+.ptabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.25rem}
+.ptab{font-size:12px;font-weight:600;padding:8px 18px;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--muted);cursor:pointer;font-family:var(--font);letter-spacing:.04em;margin-bottom:-1px;transition:all .1s}
+.ptab.active{color:var(--navy);border-bottom-color:var(--gold)}
+.pp{display:none}.pp.active{display:block}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:0 1px 4px rgba(56,61,79,.06)}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--light);border-bottom:1px solid var(--border)}
+.ct{font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.1em}
+.chint{font-size:10px;color:var(--muted)}
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+@media(max-width:768px){.igrid{grid-template-columns:1fr}}
+.tabs{display:flex;border-bottom:1px solid var(--border)}
+.tab{font-size:11px;font-weight:600;padding:7px 15px;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--muted);cursor:pointer;font-family:var(--font);letter-spacing:.04em;margin-bottom:-1px}
+.tab.active{color:var(--navy);border-bottom-color:var(--gold)}
+.tp{display:none;padding:12px}.tp.active{display:block}
+.dz{border:1.5px dashed var(--border);border-radius:var(--r);padding:1.25rem 1rem;text-align:center;cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;min-height:85px;justify-content:center;background:var(--light)}
+.dz:hover,.dz.over{border-color:var(--gold);background:#faf9f5}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dzt{font-size:12px;font-weight:600;color:var(--navy)}.dzh{font-size:10px;color:var(--muted)}
+.fpill{display:none;align-items:center;gap:8px;background:var(--light);border:1px solid var(--border);border-radius:var(--r);padding:7px 10px;margin-top:8px}
+.fn{font-size:11px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--navy)}
+.fs{font-size:10px;color:var(--muted);flex-shrink:0}
+.frm{font-size:10px;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:3px;border:1px solid var(--border);background:transparent;font-family:var(--font)}
+.fprev{font-size:10px;font-family:monospace;color:var(--muted);background:var(--light);border-top:1px solid var(--border);padding:7px 12px;max-height:50px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
+textarea{width:100%;background:var(--white);color:var(--text);border:none;font-size:12px;font-family:var(--font);padding:10px 12px;resize:vertical;line-height:1.6;outline:none}
+textarea::placeholder{color:var(--muted)}
+.nta{min-height:132px}
+.chips{padding:8px 12px;border-top:1px solid var(--border);background:var(--light);display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.chlbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-right:2px}
+.chip{font-size:10px;padding:3px 9px;border-radius:20px;border:1px solid var(--border);background:var(--white);color:var(--navy);cursor:pointer;font-family:var(--font);font-weight:500}
+.chip:hover{border-color:var(--gold);background:#faf9f5}
+.arow{display:flex;gap:10px;margin-bottom:1.25rem;align-items:center;flex-wrap:wrap}
+.btn{cursor:pointer;font-size:12px;font-weight:600;padding:9px 20px;border-radius:var(--r);border:1px solid var(--border);background:var(--white);color:var(--navy);font-family:var(--font);transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--light)}.btn:active{transform:scale(.98)}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-p{background:var(--navy);border-color:var(--navy);color:var(--white)}.btn-p:hover{background:var(--navy2)}
+.btn-g{background:var(--gold);border-color:var(--gold3);color:var(--navy)}.btn-g:hover{background:var(--gold2)}
+.smsg{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.spin{width:13px;height:13px;border:2px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scards{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:1rem}
+.sc{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px}
+.sn{font-size:22px;font-weight:700;line-height:1;color:var(--navy)}
+.sl{font-size:9px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.nbanner{background:#faf9f5;border:1px solid var(--gold);border-left:3px solid var(--gold);border-radius:var(--r);padding:10px 14px;margin-bottom:1rem;font-size:11px;color:var(--navy);line-height:1.6;white-space:pre-wrap}
+.nbanner strong{display:block;margin-bottom:3px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold3)}
+.tw{overflow-x:auto;border:1px solid var(--border);border-radius:var(--rl)}
+table{width:100%;border-collapse:collapse;font-size:11px;min-width:760px;background:var(--white)}
+thead{background:var(--navy)}
+th{padding:9px 10px;text-align:left;font-weight:700;font-size:9px;color:rgba(255,255,255,.65);border-bottom:1px solid var(--navy3);white-space:nowrap;text-transform:uppercase;letter-spacing:.08em}
+td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.4}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:#fafaf8}
+tbody tr.nm td{background:#faf9f5}
+tbody tr.nm td:first-child{border-left:2px solid var(--gold)}
+.badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:20px;font-weight:700;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
+.bc{background:#e8f5ee;color:#2a7a4a;border:1px solid #b8dfc8}
+.bs{background:#eaf0f8;color:#2d5a8e;border:1px solid #b8cfe8}
+.bn2{background:#faf9f0;color:#8a7a2a;border:1px solid var(--gold)}
+.bu{background:#fdf5e6;color:#8a6a0a;border:1px solid #e8cc88}
+.bb{background:#fdf0f0;color:#8a2a2a;border:1px solid #e8b8b8}
+.buser{background:#f0f0fa;color:#4a3a9a;border:1px solid #c8c0e8}
+.mono{font-family:monospace;font-size:10px;color:var(--navy);font-weight:600}
+.muted{color:var(--muted);font-size:10px}.it{font-style:italic}
+select{font-size:10px;font-family:monospace;padding:3px 7px;border-radius:4px;border:1px solid var(--border);background:var(--white);color:var(--navy);max-width:200px}
+.fbox{margin-top:1rem;border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
+.fh{font-size:9px;font-weight:700;color:var(--muted);padding:8px 14px;background:var(--light);border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.1em}
+.fi{font-size:11px;padding:7px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;line-height:1.4;background:var(--white)}
+.fi:last-child{border-bottom:none}
+.fico{color:var(--amber);flex-shrink:0;font-weight:700}
+.dlrow{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap}
+.ebox{background:#fdf0f0;border:1px solid #e8b8b8;border-left:3px solid #c0392b;border-radius:var(--r);padding:12px 14px;font-size:12px;color:#6a1515;line-height:1.6;margin-top:8px}
+.hbar{background:var(--white);border:1px solid var(--border);border-radius:var(--r);margin-bottom:1rem;overflow:hidden}
+.htog{width:100%;display:flex;align-items:center;gap:8px;padding:9px 14px;background:transparent;border:none;font-family:var(--font);font-size:12px;font-weight:600;color:var(--navy);cursor:pointer;text-align:left}
+.htog:hover{background:var(--light)}
+.htog .arr{margin-left:auto;font-size:10px;color:var(--muted)}
+.hlist{display:none;border-top:1px solid var(--border)}
+.hitem{padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.hitem:last-child{border-bottom:none}.hitem:hover{background:var(--light)}
+.hdate{color:var(--muted);flex-shrink:0;font-size:10px}.hname{font-weight:600;flex:1}.hmeta{font-size:10px;color:var(--muted)}
+.lbt{width:100%;border-collapse:collapse}
+.lbt th{background:var(--light);padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border)}
+.lbt td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px}
+.lbt tr:last-child td{border-bottom:none}.lbt tr:hover td{background:var(--light)}
+.lbar{height:6px;background:var(--gold);border-radius:3px}
+.lbw{width:120px;background:var(--light);border-radius:3px;overflow:hidden}
+.foot{height:28px;background:var(--navy);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.foot::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,rgba(186,178,143,.1) 0,rgba(186,178,143,.1) 1px,transparent 0,transparent 50%);background-size:6px 6px}
+.foot span{font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;position:relative}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--light)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 </style>
 </head>
 <body>
-
-<!-- ═══════════════ AUTH SCREEN ═══════════════ -->
-<div id="auth-screen">
+<div id="auth">
   <div class="auth-card">
-    <div class="auth-logo">BLACKBEARD</div>
-    <div class="auth-subtitle">Enter your email to sign in</div>
-    <input type="email" id="auth-email" placeholder="you@zanda.com.au" autocomplete="email">
-    <button class="btn" id="btn-magic-link">Send sign-in link</button>
-    <div class="divider">or</div>
-    <button class="btn btn-ghost" id="btn-ms-sso">Sign in with Microsoft</button>
-    <div id="auth-msg" style="font-size:12px;color:var(--text-dim);text-align:center;min-height:18px;"></div>
+    <div class="auth-top"><div class="auth-title">Black<span>beard</span></div></div>
+    <div class="auth-bar"></div>
+    <div class="auth-body">
+      <p class="auth-sub">Enter your email to sign in</p>
+      <input class="auth-input" id="emailInput" type="email" placeholder="you@yourdomain.com" onkeydown="if(event.key==='Enter')sendMagicLink()">
+      <button class="auth-btn" id="magicBtn" onclick="sendMagicLink()">Send sign-in link</button>
+      <div class="auth-msg" id="authMsg"></div>
+      <div class="auth-or">or</div>
+      <button class="ms-btn" onclick="msLogin()">
+        <div class="ms-icon"><span style="background:#f25022"></span><span style="background:#7fba00"></span><span style="background:#00a4ef"></span><span style="background:#ffb900"></span></div>
+        Sign in with Microsoft
+      </button>
+    </div>
   </div>
 </div>
 
-<!-- ═══════════════ APP SHELL ═══════════════ -->
 <div id="app">
-  <div class="topbar">
-    <div class="topbar-logo">BLACKBEARD</div>
-    <div class="topbar-right">
-      <div class="user-badge" id="user-badge">Z</div>
-      <button class="btn btn-ghost btn-sm" id="btn-signout">Sign out</button>
+  <div class="bar">
+    <div class="bar-title">Black<span>beard</span></div>
+    <div class="bar-right">
+      <div class="user-pill"><div class="user-av" id="uInit">Z</div><span id="uName"></span></div>
+      <button class="out-btn" onclick="signOut()">Sign out</button>
     </div>
   </div>
-
-  <div class="nav-tabs">
-    <button class="nav-tab active" data-tab="process">Process schedule</button>
-    <button class="nav-tab" data-tab="history">History</button>
-    <button class="nav-tab" data-tab="leaderboard">Leaderboard</button>
-  </div>
-
-  <!-- ── PROCESS PANEL ── -->
-  <div class="panel active" id="tab-process">
-    <div class="section-label">📋  Recent schedules ▼</div>
-
-    <div style="margin:20px 0 16px">
-      <div class="section-label">Competitor schedule</div>
-      <div class="tab-switcher">
-        <button class="tab-switch active" data-input="file">Upload file</button>
-        <button class="tab-switch" data-input="paste">Paste text</button>
+  <div class="gold-bar"></div>
+  <div class="main">
+    <div class="ptabs">
+      <button class="ptab active" onclick="showPage('schedule')">Process schedule</button>
+      <button class="ptab" onclick="showPage('history')">History</button>
+      <button class="ptab" onclick="showPage('leaderboard')">Leaderboard</button>
+    </div>
+    <div id="pp-schedule" class="pp active">
+      <div class="hbar">
+        <button class="htog" onclick="togHist()">📋 &nbsp;Recent schedules <span class="arr" id="harr">▼</span></button>
+        <div class="hlist" id="hlist"></div>
       </div>
-
-      <!-- File upload pane -->
-      <div id="input-file">
-        <div class="upload-zone" id="drop-zone">
-          <input type="file" id="file-input" multiple accept=".pdf,.xlsx,.xls,.csv,.txt">
-          <div class="upload-icon">📂</div>
-          <div>Drop file here or click to browse</div>
-          <div class="upload-hint">Multiple files supported — they'll be merged and deduplicated</div>
-          <div class="upload-types">
-            <span class="type-badge">PDF</span>
-            <span class="type-badge">Excel</span>
-            <span class="type-badge">CSV</span>
+      <div class="igrid">
+        <div class="card">
+          <div class="ch"><span class="ct">Competitor schedule</span><span class="chint">Excel · CSV · PDF · paste</span></div>
+          <div class="tabs">
+            <button class="tab active" onclick="swTab('file')">Upload file</button>
+            <button class="tab" onclick="swTab('paste')">Paste text</button>
           </div>
-        </div>
-        <div class="file-queue" id="file-queue"></div>
-        <!-- extraction hints -->
-        <div id="extraction-types" style="font-size:12px;color:var(--text-dim);margin-top:8px;display:none">
-          Novas · Dormakaba · Entro · Lockwood · Allegion
-        </div>
-      </div>
-
-      <!-- Paste pane -->
-      <div id="input-paste" style="display:none">
-        <textarea class="paste-area" id="paste-input" placeholder="Paste schedule text here — product codes, descriptions, quantities…"></textarea>
-      </div>
-    </div>
-
-    <!-- Notes -->
-    <div class="notes-section">
-      <div class="section-label">Project notes & instructions<span style="color:var(--text-dim);font-weight:400;text-transform:none;letter-spacing:0;font-size:11px"> — Overrides defaults</span></div>
-      <textarea class="notes-input" id="notes-input" placeholder="e.g. GN throughout · Fire doors SS · Streamline levers · BN/SS split FOH/BOH…"></textarea>
-      <div class="quick-tags">
-        <span class="quick-tag" data-note="GN throughout">GN throughout</span>
-        <span class="quick-tag" data-note="Fire doors SS">Fire doors SS</span>
-        <span class="quick-tag" data-note="Streamline levers">Streamline</span>
-        <span class="quick-tag" data-note="Epic Return levers">Epic Return</span>
-        <span class="quick-tag" data-note="Duke levers">Duke</span>
-        <span class="quick-tag" data-note="Raven seals throughout">Raven seals</span>
-        <span class="quick-tag" data-note="BN front of house, SS back of house">BN/SS split</span>
-        <span class="quick-tag" data-note="Flag all 'by others' items">Flag by-others</span>
-      </div>
-    </div>
-
-    <!-- Progress -->
-    <div class="status-box" id="status-box">
-      <div id="status-steps"></div>
-      <div class="progress-bar-wrap" id="progress-wrap">
-        <div class="progress-bar" id="progress-bar"></div>
-      </div>
-    </div>
-
-    <div class="action-row">
-      <button class="btn" id="btn-process">Process schedule</button>
-      <button class="btn btn-ghost" id="btn-clear">Clear</button>
-      <span id="process-hint" style="font-size:12px;color:var(--text-dim)"></span>
-    </div>
-
-    <!-- Result -->
-    <div class="result-area" id="result-area">
-      <div class="result-header">
-        <div class="result-title">Substitution analysis</div>
-        <div class="result-actions">
-          <button class="btn btn-ghost btn-sm" id="btn-copy-analysis">Copy analysis</button>
-        </div>
-      </div>
-      <div class="result-content" id="result-content"></div>
-
-      <!-- CSV outputs -->
-      <div class="csv-section" id="csv-section" style="display:none">
-        <div class="csv-tabs">
-          <div class="csv-tab active" data-csv="promaster">Promaster CSV</div>
-          <div class="csv-tab" data-csv="bc">BC Quote CSV</div>
-        </div>
-        <div class="csv-content">
-          <div class="csv-pane active" id="csv-promaster">
-            <div class="csv-toolbar">
-              <span style="font-size:12px;color:var(--text-dim)">5 columns · Promaster import</span>
-              <button class="btn btn-sm" id="btn-dl-promaster">Download CSV</button>
+          <div id="tp-file" class="tp active">
+            <div class="dz" id="dz" ondragover="dov(event)" ondragleave="dlv()" ondrop="ddrop(event)">
+              <input type="file" id="fi" accept=".xlsx,.xls,.csv,.txt,.pdf" onchange="fsel(event)">
+              <div class="dzt">Drop file here or click to browse</div>
+              <div class="dzh">Novas · Dormakaba · Entro · Lockwood · Allegion</div>
             </div>
-            <div class="csv-rows" id="rows-promaster"></div>
+            <div class="fpill" id="fpill"></div>
+            <div id="fprev"></div>
           </div>
-          <div class="csv-pane" id="csv-bc">
-            <div class="csv-toolbar">
-              <span style="font-size:12px;color:var(--text-dim)">2 columns · BC quote import</span>
-              <button class="btn btn-sm" id="btn-dl-bc">Download CSV</button>
-            </div>
-            <div class="csv-rows" id="rows-bc"></div>
+          <div id="tp-paste" class="tp">
+            <textarea id="ptxt" placeholder="Paste schedule or BOQ…" style="min-height:118px;font-family:monospace"></textarea>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><span class="ct">Project notes &amp; instructions</span><span class="chint">Overrides defaults</span></div>
+          <textarea class="nta" id="ntxt" placeholder="Project-specific instructions actively guide the output.
+
+Examples:
+• Use Streamline to match Novas 63 Lever. GN instead of antique bronze.
+• All fire doors — SS finish on hinges and locks.
+• Change Duke pull handles to Polo 7098.BB.BLK.
+• Basement Stair: Duke SN + 1450, free egress inside, keyed outside, fire rated closer."></textarea>
+          <div class="chips">
+            <span class="chlbl">Quick:</span>
+            <span class="chip" onclick="addNote('Use GN finish throughout — replace all antique bronze / gunmetal.')">GN throughout</span>
+            <span class="chip" onclick="addNote('All fire doors — SS finish on hinges and locks.')">Fire doors SS</span>
+            <span class="chip" onclick="addNote('Use Streamline range for all lever sets.')">Streamline</span>
+            <span class="chip" onclick="addNote('Use Epic Return range for all lever sets.')">Epic Return</span>
+            <span class="chip" onclick="addNote('Use Duke range for all lever sets.')">Duke</span>
+            <span class="chip" onclick="addNote('All seals to Raven.')">Raven seals</span>
+            <span class="chip" onclick="addNote('FOH finish: BN. BOH finish: SS.')">BN/SS split</span>
+            <span class="chip" onclick="addNote('Flag any items not supplied by Zanda.')">Flag by-others</span>
           </div>
         </div>
       </div>
+      <div class="arow">
+        <button class="btn btn-p" id="runBtn" onclick="run()">Process schedule</button>
+        <button class="btn" onclick="clearAll()">Clear</button>
+        <div class="smsg" id="smsg"></div>
+      </div>
+      <div id="results"></div>
     </div>
-  </div>
-
-  <!-- ── HISTORY PANEL ── -->
-  <div class="panel" id="tab-history">
-    <div class="section-label" style="margin-bottom:16px">All processed schedules</div>
-    <div class="history-list" id="history-list">
-      <div class="empty-state">
-        <div class="empty-state-icon">📜</div>
-        <p>Loading…</p>
+    <div id="pp-history" class="pp">
+      <div class="card">
+        <div class="ch"><span class="ct">All processed schedules</span></div>
+        <div id="histFull" style="padding:1rem;font-size:12px;color:var(--muted)">Loading…</div>
+      </div>
+    </div>
+    <div id="pp-leaderboard" class="pp">
+      <div class="card">
+        <div class="ch"><span class="ct">Leaderboard</span><span class="chint">Most active users</span></div>
+        <div id="lbContent" style="padding:1rem;font-size:12px;color:var(--muted)">Loading…</div>
       </div>
     </div>
   </div>
-
-  <!-- ── LEADERBOARD PANEL ── -->
-  <div class="panel" id="tab-leaderboard">
-    <div class="section-label" style="margin-bottom:16px">Leaderboard<span style="color:var(--text-dim);font-weight:400;text-transform:none;font-size:11px;letter-spacing:0"> — Most active users</span></div>
-    <div id="lb-content">
-      <div class="empty-state">
-        <div class="empty-state-icon">🏆</div>
-        <p>Loading…</p>
-      </div>
-    </div>
-  </div>
+  <div class="foot"><span>Blackbeard</span></div>
 </div>
-
-<!-- Toast -->
-<div id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════════════════════
-const SUPABASE_URL = 'https://ebgykbxxruftohpgifbe.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViZ3lrYnh4cnVmdG9ocGdpZmJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NjMyNTMsImV4cCI6MjA5MTMzOTI1M30.vqeglKXgYA6cVyLvKx8eQQtsp_rfGfUaoj0zLlaJUno';
-const EDGE_BASE = `${SUPABASE_URL}/functions/v1/ai-proxy`;
+const SB_URL='https://ebgykbxxruftohpgifbe.supabase.co';
+const SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViZ3lrYnh4cnVmdG9ocGdpZmJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NjMyNTMsImV4cCI6MjA5MTMzOTI1M30.vqeglKXgYA6cVyLvKx8eQQtsp_rfGfUaoj0zLlaJUno';
+const EDGE=SB_URL+'/functions/v1/ai-proxy';
+const EXTRACT=EDGE+'/extract';
+const {createClient}=supabase;
+const sb=createClient(SB_URL,SB_ANON);
+let user=null,results=[],flags=[],fileText='',activeTab='file';
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-let currentUser = null;
-
-// ═══════════════════════════════════════════════════════
-// SYSTEM PROMPT
-// ═══════════════════════════════════════════════════════
-const SYSTEM_PROMPT = `You are the Zanda Spec Substitution Agent — an internal tool for Zanda Architectural Hardware (Australia).
-
-NORTH STAR: Extract competitor door hardware schedules and suggest Zanda equivalents. Output is a suggestion only — the user owns every decision.
-
-FRAMING: Always say "Here is the extracted schedule data. Here are substitutions we have used on similar projects before, just in case you are interested."
-
-RULES (apply strictly):
-1. SEALS: Always substitute to Raven. No exceptions. (Novas, Kilargo, Lorient → Raven)
-2. DEFAULT FINISH: Brushed Nickel (BN). Satin Chrome (SC) → BN. Satin Nickel (SN) → BN.
-3. SS SCHEDULE: Suggest Garrison as technically correct, but ALWAYS show BN alternative (Epic/Duke/Streamline) — better margin, unique to Zanda.
-4. SC SCHEDULE: Swap to BN as default.
-5. NEVER conclude unavailable — always find a substitute. If imperfect, note "closest equivalent."
-6. BACKSET: Flag if competitor uses 89mm or 127mm (Zanda 1450 = 60mm).
-7. FIRE RATING: Zanda 1450 is fire rated — if competitor is not, flag as upgrade.
-8. HANDING: Competitor may supply LH/RH; Zanda often universal — flag as many-to-one.
-9. BY OTHERS: Panic hardware, aluminium door operators, glass hardware, high-security cylinders → keep original spec, flag BY OTHERS.
-10. POLISHED FINISHES (BC/CP/PB/PSS): Flag that Zanda cannot complete a polished project but can supply individual items.
-
-OUTPUT FORMAT:
-1. Brief summary of what you found (manufacturer, product types, finish, estimated item count)
-2. Substitution table with columns: Comp Code | Description | Zanda Code | Zanda Description | Finish | Notes
-3. Any flags or anomalies
-4. Two CSV blocks labelled ===PROMASTER_CSV=== and ===BC_CSV===
-
-PROMASTER CSV (5 cols): PartCode,Description,BrandName,FinishShort,ProductQuantity
-BC CSV (2 cols): No.,Quantity
-
-Zanda code format: [base code].[finish] e.g. 10001.BN
-For Raven seals: use Raven code as PartCode, BrandName = Raven
-
-Apply any project notes/instructions provided by the user — these override defaults.`;
-
-// ═══════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════
-let fileQueue = []; // { id, file, name, ext, status, text, error }
-let lastPromaster = '';
-let lastBcCsv = '';
-let activeInputMode = 'file';
-
-// ═══════════════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════════════
-function toast(msg, type = '') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'show' + (type ? ' ' + type : '');
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.className = '', 3200);
+async function init(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(session)showApp(session.user);
+  sb.auth.onAuthStateChange((_,s)=>{if(s)showApp(s.user);else showAuth();});
 }
-
-function setStep(steps) {
-  const box = document.getElementById('status-box');
-  const el = document.getElementById('status-steps');
-  box.classList.add('visible');
-  el.innerHTML = steps.map(s =>
-    `<div class="status-step step-${s.state}">
-      <span class="step-icon"></span>
-      <span>${s.label}</span>
-    </div>`
-  ).join('');
+function showAuth(){document.getElementById('auth').style.display='flex';document.getElementById('app').style.display='none';}
+function showApp(u){
+  user=u;
+  document.getElementById('auth').style.display='none';
+  document.getElementById('app').style.display='flex';
+  const name=u.user_metadata?.full_name||u.email||'User';
+  document.getElementById('uName').textContent=name.split(' ')[0];
+  document.getElementById('uInit').textContent=name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  loadHist();
 }
-
-function setProgress(pct) {
-  const wrap = document.getElementById('progress-wrap');
-  const bar = document.getElementById('progress-bar');
-  wrap.classList.toggle('visible', pct > 0 && pct < 100);
-  bar.style.width = pct + '%';
+async function sendMagicLink(){
+  const email=document.getElementById('emailInput').value.trim();
+  const msg=document.getElementById('authMsg');
+  const btn=document.getElementById('magicBtn');
+  if(!email){msg.textContent='Enter your email first.';msg.className='auth-msg err';return;}
+  btn.disabled=true;msg.textContent='Sending…';msg.className='auth-msg';
+  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.href}});
+  if(error){msg.textContent=error.message;msg.className='auth-msg err';btn.disabled=false;}
+  else{msg.textContent='✓ Check your email for a sign-in link.';msg.className='auth-msg ok';}
 }
-
-function fileIcon(ext) {
-  return ext === 'pdf' ? '📄' : ext === 'xlsx' || ext === 'xls' ? '📊' : '📋';
+async function msLogin(){
+  const {error}=await sb.auth.signInWithOAuth({provider:'azure',options:{scopes:'email profile',redirectTo:window.location.href}});
+  if(error)alert(error.message);
 }
-
-function formatBytes(n) {
-  if (n < 1024) return n + ' B';
-  if (n < 1048576) return (n/1024).toFixed(1) + ' KB';
-  return (n/1048576).toFixed(1) + ' MB';
+async function signOut(){await sb.auth.signOut();showAuth();}
+function showPage(p){
+  document.querySelectorAll('.ptab').forEach((b,i)=>b.classList.toggle('active',['schedule','history','leaderboard'][i]===p));
+  document.querySelectorAll('.pp').forEach(el=>el.classList.remove('active'));
+  document.getElementById('pp-'+p).classList.add('active');
+  if(p==='history')loadHistFull();
+  if(p==='leaderboard')loadLB();
 }
+function swTab(t){
+  activeTab=t;
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='file')||(i===1&&t==='paste')));
+  document.getElementById('tp-file').classList.toggle('active',t==='file');
+  document.getElementById('tp-paste').classList.toggle('active',t==='paste');
+}
+function addNote(txt){const ta=document.getElementById('ntxt');ta.value=(ta.value.trim()?ta.value.trim()+'\n':'')+txt;ta.focus();}
+function dov(e){e.preventDefault();document.getElementById('dz').classList.add('over');}
+function dlv(){document.getElementById('dz').classList.remove('over');}
+function ddrop(e){e.preventDefault();document.getElementById('dz').classList.remove('over');const f=e.dataTransfer.files[0];if(f)loadFile(f);}
+function fsel(e){const f=e.target.files[0];if(f)loadFile(f);}
+function loadFile(file){
+  const ext=file.name.split('.').pop().toLowerCase();
+  const sz=file.size<1048576?Math.round(file.size/1024)+' KB':(file.size/1048576).toFixed(1)+' MB';
+  const icon=ext==='pdf'?'📄':(ext==='xlsx'||ext==='xls')?'📊':'📋';
+  const p=document.getElementById('fpill');
+  p.style.display='flex';
+  p.innerHTML=`<span>${icon}</span><span class="fn">${file.name}</span><span class="fs">${sz}</span><button class="frm" onclick="rmFile()">✕</button>`;
+  document.getElementById('dz').style.display='none';
+  if(ext==='xlsx'||ext==='xls')readXL(file);
+  else if(ext==='pdf')readPDF(file);
+  else readTxt(file);
+}
+function readTxt(f){const r=new FileReader();r.onload=e=>{fileText=e.target.result;showPrev(fileText);};r.readAsText(f);}
+function readXL(f){
+  const r=new FileReader();
+  r.onload=e=>{
+    try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});let t='';wb.SheetNames.forEach(n=>{t+=XLSX.utils.sheet_to_csv(wb.Sheets[n])+'\n';});fileText=t;showPrev(t);}
+    catch(err){setSt('Excel error: '+err.message,false);}
+  };r.readAsArrayBuffer(f);
+}
+async function readPDF(file){
+  setSt('Extracting PDF…',true);
+  try{
+    const {data:{session}}=await sb.auth.getSession();
+    if(!session)throw new Error('Not authenticated');
+    const fd=new FormData();
+    fd.append('files',file,file.name);
+    const resp=await fetch(EXTRACT,{method:'POST',headers:{'apikey':SB_ANON,'authorization':`Bearer ${session.access_token}`},body:fd});
+    if(!resp.ok){const e=await resp.json().catch(()=>({error:resp.statusText}));throw new Error(e.error||`HTTP ${resp.status}`);}
+    const data=await resp.json();
+    const result=data.files?.[0];
+    if(!result)throw new Error('No result from extraction service');
+    if(result.error)throw new Error(result.error);
+    if(!result.text||result.text.length<20)throw new Error('PDF appears to be scanned/image-only — try pasting the text instead');
+    fileText=result.text;
+    showPrev(fileText);
+    setSt(`✓ ${(fileText.length/1000).toFixed(0)}k chars extracted`,false);
+  }catch(err){setSt('PDF error: '+err.message,false);fileText='';}
+}
+function showPrev(t){const lines=t.split('\n').slice(0,5).join('\n');document.getElementById('fprev').innerHTML=`<div class="fprev">${esc(lines)}${t.split('\n').length>5?'\n…':''}</div>`;}
+function rmFile(){fileText='';document.getElementById('fpill').style.display='none';document.getElementById('fprev').innerHTML='';document.getElementById('dz').style.display='';document.getElementById('fi').value='';setSt('',false);}
+function setSt(msg,spin){document.getElementById('smsg').innerHTML=spin?`<div class="spin"></div>${msg}`:msg;}
+function clearAll(){rmFile();document.getElementById('ptxt').value='';document.getElementById('ntxt').value='';document.getElementById('results').innerHTML='';results=[];flags=[];setSt('',false);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-function uid() { return Math.random().toString(36).slice(2); }
+async function ai(system,content,max=1500){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session)throw new Error('Not authenticated');
+  const messages=[{role:'user',content:Array.isArray(content)?content:[{type:'text',text:content}]}];
+  const r=await fetch(EDGE,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({system,messages,max_tokens:max})});
+  if(!r.ok){const e=await r.json().catch(()=>({error:r.statusText}));throw new Error(e.error||`HTTP ${r.status}`);}
+  const d=await r.json();if(d.error)throw new Error(d.error);return d.text;
+}
+async function lookupSubs(codes){
+  const norms=codes.map(c=>c.toUpperCase().replace(/[\s\/\-\*\.]/g,''));
+  const {data}=await sb.from('substitutions').select('competitor_code_norm,competitor_description,zanda_code,zanda_description,zanda_category,finish_mapping_note,is_by_others,source').in('competitor_code_norm',norms);
+  const map={};(data||[]).forEach(r=>{map[r.competitor_code_norm]=r;});return map;
+}
+async function storeSub(row){
+  await sb.from('substitutions').upsert({competitor_code:row.compCode,competitor_code_norm:row.compCode.toUpperCase().replace(/[\s\/\-\*\.]/g,''),competitor_description:row.compDesc,zanda_code:row.zandaCode,zanda_description:row.zandaDesc,source:'user_confirmed',confirmed_by:user?.id,confirmed_at:new Date().toISOString()},{onConflict:'competitor_code_norm'});
+}
+async function saveProject(name,brand,count,notes){
+  const {data,error}=await sb.from('projects').insert({project_name:name,competitor_brand:brand,file_name:'upload',line_count:count,status:'complete',uploaded_by:user?.id,notes:notes||null}).select().single();
+  if(error){console.warn(error);return null;}return data.id;
+}
+async function saveLines(pid,lines){
+  if(!pid||!lines.length)return;
+  await sb.from('project_lines').insert(lines.map(r=>({project_id:pid,competitor_code:r.compCode,competitor_description:r.compDesc||null,door_ref:r.door||null,qty:r.qty,zanda_code:r.zandaCode,zanda_description:r.zandaDesc||null,match_type:r.nm?'notes_driven':r.matchType,notes_driven:r.nm||false,notes:r.notes||null})));
+}
+async function logUse(action,count,brand){
+  if(!user)return;
+  await sb.from('usage_log').insert({user_id:user.id,user_email:user.email,user_name:user.user_metadata?.full_name||user.email,action,line_count:count||null,competitor_brand:brand||null});
+}
+async function loadHist(){
+  const {data}=await sb.from('projects').select('id,project_name,competitor_brand,line_count,uploaded_at').order('uploaded_at',{ascending:false}).limit(10);
+  const list=document.getElementById('hlist');
+  if(!data||!data.length){list.innerHTML='<div style="padding:10px 14px;font-size:11px;color:var(--muted)">No past schedules yet.</div>';return;}
+  list.innerHTML=data.map(p=>`<div class="hitem" onclick="loadProject('${p.id}')"><span class="hdate">${new Date(p.uploaded_at).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}</span><span class="hname">${esc(p.project_name||'Untitled')}</span><span class="hmeta">${p.competitor_brand||''} · ${p.line_count||0} lines</span></div>`).join('');
+}
+async function loadHistFull(){
+  const {data}=await sb.from('projects').select('id,project_name,competitor_brand,line_count,uploaded_at').order('uploaded_at',{ascending:false}).limit(50);
+  const el=document.getElementById('histFull');
+  if(!data||!data.length){el.innerHTML='<p>No schedules yet.</p>';return;}
+  el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:var(--light)">${['Date','Project','Brand','Lines',''].map(h=>`<th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)">${h}</th>`).join('')}</tr></thead><tbody>${data.map(p=>`<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-size:11px;color:var(--muted)">${new Date(p.uploaded_at).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'2-digit'})}</td><td style="padding:8px 12px;font-weight:600">${esc(p.project_name||'Untitled')}</td><td style="padding:8px 12px;font-size:11px;color:var(--muted)">${p.competitor_brand||'—'}</td><td style="padding:8px 12px;font-weight:600">${p.line_count||0}</td><td style="padding:8px 12px"><button class="btn" style="padding:4px 10px;font-size:10px" onclick="loadProject('${p.id}');showPage('schedule')">Load</button></td></tr>`).join('')}</tbody></table>`;
+}
+async function loadLB(){
+  const {data}=await sb.from('usage_log').select('user_name,user_email,action').eq('action','process_schedule');
+  const el=document.getElementById('lbContent');
+  if(!data||!data.length){el.innerHTML='<p>No activity yet. Process a schedule to appear here.</p>';return;}
+  const counts={};data.forEach(r=>{const n=r.user_name||r.user_email||'Unknown';counts[n]=(counts[n]||0)+1;});
+  const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const max=sorted[0]?.[1]||1;
+  const medals=['🥇','🥈','🥉'];
+  el.innerHTML=`<table class="lbt"><thead><tr><th>#</th><th>User</th><th>Schedules</th><th></th></tr></thead><tbody>${sorted.map(([name,count],i)=>`<tr><td style="font-weight:700;width:30px">${i<3?medals[i]:(i+1)}</td><td style="font-weight:600">${esc(name)}</td><td style="font-weight:700;color:var(--gold3)">${count}</td><td><div class="lbw"><div class="lbar" style="width:${Math.round(count/max*100)}%"></div></div></td></tr>`).join('')}</tbody></table>`;
+}
+async function loadProject(id){
+  const {data}=await sb.from('project_lines').select('*').eq('project_id',id);
+  if(!data)return;
+  results=data.map(r=>({compCode:r.competitor_code,compDesc:r.competitor_description||'',qty:r.qty,door:r.door_ref||'',zandaCode:r.zanda_code||'',zandaDesc:r.zanda_description||'',matchType:r.match_type||'suggested',notes:r.notes||'',nm:r.notes_driven||false}));
+  togHist();render(results,'');
+}
+function togHist(){const l=document.getElementById('hlist');const a=document.getElementById('harr');const o=l.style.display==='block';l.style.display=o?'none':'block';a.textContent=o?'▼':'▲';}
 
-// ═══════════════════════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════════════════════
-async function initAuth() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) showApp(session.user);
-
-  sb.auth.onAuthStateChange((_, session) => {
-    if (session) showApp(session.user);
-    else showAuthScreen();
+async function run(){
+  let input='';
+  if(activeTab==='file'){if(!fileText){setSt('No file loaded — or PDF extraction failed.',false);return;}input=fileText;}
+  else{input=document.getElementById('ptxt').value.trim();if(!input){setSt('Paste a schedule first.',false);return;}}
+  const notes=document.getElementById('ntxt').value.trim();
+  const btn=document.getElementById('runBtn');
+  btn.disabled=true;setSt('Parsing schedule…',true);
+  try{
+    const parsed=await parse(input,notes);
+    if(!parsed.length){setSt('No items found — check format.',false);btn.disabled=false;return;}
+    setSt(`Matching ${parsed.length} items…`,true);
+    const res=await matchAll(parsed,notes);
+    results=res;setSt('',false);btn.disabled=false;
+    const brand=detBrand(parsed);
+    logUse('process_schedule',res.length,brand);
+    const pid=await saveProject(input.trim().slice(0,60)||'Schedule',brand,res.length,notes);
+    if(pid){await saveLines(pid,res);loadHist();}
+    render(res,notes);
+  }catch(e){
+    setSt('',false);btn.disabled=false;
+    document.getElementById('results').innerHTML=`<div class="ebox"><strong>Error: ${esc(e.message)}</strong><br><br>Ensure the Anthropic API key is set in Supabase Edge Function secrets.</div>`;
+  }
+}
+function detBrand(items){
+  const c=items.map(i=>i.code.toUpperCase());
+  if(c.some(x=>x.startsWith('PR0')||x.includes('SABZ')))return'Novas';
+  if(c.some(x=>x.startsWith('DKH')||x.startsWith('MS2')))return'Dormakaba';
+  if(c.some(x=>x.startsWith('B01')||x.startsWith('B31')||x.startsWith('D065')))return'Entro';
+  if(c.some(x=>x.startsWith('LW')||x.startsWith('3772')))return'Lockwood';
+  return'Unknown';
+}
+async function parse(text,notes){
+  const trunc=text.length>12000?text.slice(0,12000)+'\n[truncated]':text;
+  const raw=await ai('You are a door hardware schedule parser. Return only valid JSON arrays.',`Parse this schedule. Extract every unique product. Tally quantities if door-by-door. Return ONLY:\n[{"code":"CODE","description":"DESC","qty":NUMBER,"door":"DOOR_OR_EMPTY"}]\nCombine identical codes, default qty=1, ignore headers.${notes?'\nNotes:\n'+notes:''}\n\nSchedule:\n${trunc}`,2000);
+  try{return JSON.parse(raw.replace(/```json|```/g,'').trim());}catch(e){return[];}
+}
+async function matchAll(items,notes){
+  results=[];flags=[];
+  const dbMap=await lookupSubs(items.map(i=>i.code));
+  const unknowns=[],uidxs=[];
+  items.forEach((item,i)=>{
+    const key=item.code.toUpperCase().replace(/[\s\/\-\*\.]/g,'');
+    const db=dbMap[key];
+    if(db&&!notes){results.push({compCode:item.code,compDesc:item.description||db.competitor_description||'',qty:item.qty,door:item.door||'',zandaCode:db.zanda_code,zandaDesc:db.zanda_description||'',matchType:'confirmed',notes:db.finish_mapping_note||'',nm:false,cat:db.zanda_category||'ALL'});}
+    else{results.push(null);unknowns.push(item);uidxs.push(i);}
   });
+  if(unknowns.length){
+    const cs=12;
+    for(let ci=0;ci<Math.ceil(unknowns.length/cs);ci++){
+      const chunk=unknowns.slice(ci*cs,(ci+1)*cs);
+      setSt(`AI lookup ${ci+1}/${Math.ceil(unknowns.length/cs)}…`,true);
+      const air=await aiLookup(chunk,notes);
+      air.forEach((a,j)=>{if(a.matchType==='by_others')flags.push({code:chunk[j].code,reason:a.notes||'Not supplied by Zanda'});});
+      uidxs.slice(ci*cs,(ci+1)*cs).forEach((origIdx,j)=>{results[origIdx]=air[j];});
+    }
+  }
+  return results;
+}
+async function aiLookup(items,notes){
+  const kb=`ZANDA SUBSTITUTION RULES:
+FINISHES: BN=Brushed Nickel (default FOH; replaces SC/SN/SNP/silver-SABZ), GN=Graphite Nickel (replaces GM/Gunmetal), SS=Stainless Steel (default BOH/fire), BLK=Matt Black, SB=Satin Brass, EB=Ember Bronze. SC->BN.
+RAVEN: ALL seals -> always Raven: A8SIC32(820mm),A8SIC36(920mm),A8SIC42(1070mm),A120S,A120LS,A120DS,A120LDS.
+KEY SUBS: Lockwood 3772->1450.SS. 3774->1131.SS. Nightlatches->10432.SS. Oval cyl->1160+finish. Entro A0100SSSM->1450.SS. Entro B3110SSS->9613.SS. Entro B3610SSS->9610.SS. Entro B0110SSS->10001.BN. Entro D0653SIL->TS.9205.FB.SE. Entro D0652SIL->TS.8016.SA.SE. Entro D1203SIL-B->TS.8015.CAB.SIL. Entro D0753SIL->TS.8016.FB.SE. Entro J0301SSS->5904.SS. Entro J0520SSS->5908.SS. Entro G3200SSS->10430.SS. Entro G0104SSS->10405.SS. Entro G0106SSS->10407.SS. Entro G0115SSS->10406.SS. Entro G4001SSS->11530.SS. Entro K0101SSS->14008.BN. Entro K0401SSS->5266.SC. Entro B0004SSS->7027. Entro B0005SSS->7023. Entro A5000MKA1->1160. Entro A5000XKA1->1160. Entro A5000ZKA1->1160. Entro A1001SSS->10416.SS. Entro F8006SCA->A8SIC36(Raven). Entro F7019SCA->Raven meeting stile seal. Entro KP720X150SSS->11600.720.SS. Entro KP870X150SSS->11600.870.SS. Entro KP920X150SSS->11600.920.SS. Entro KP920X320SSS->11600.920X320.SS. Entro C1106SSS->7122.BB.SS.
+CLOSERS: TS.9205.FB.SE(std fb),TS.9205.SA.SE(std sa),TS.8016.FB.SE(heavy fb),TS.8016.SA.SE(heavy sa),TS.8015.CAB.SIL(cam pull DDA),TS.8024.FB(economy).
+RANGES: Epic Return(10001-10004),Epic(10021-10026),Duke Return(10051-10054),Duke(10091-10096),Streamline(7314/7315.PR/7316).
+BY OTHERS: panic exit devices,aluminium hinges,access control electronics,glass hardware,gate hardware,card readers,electric strikes (unless ESV.100/ESV.200),PTD,reed sensors,frame seals by door mfr,master keyed cylinders by locksmith.
+${notes?'PROJECT NOTES (override ALL defaults):\n'+notes:''}`;
+  const list=items.map((it,i)=>`${i+1}. Code:"${it.code}" Desc:"${it.description||''}" Door:"${it.door||''}"`).join('\n');
+  const raw=await ai(kb,`For each item return a JSON array:\n[{"zandaCode":"","zandaDesc":"","matchType":"confirmed|suggested|by_others|unresolved","notes":"","nm":false,"cat":""}]\nnm=true if notes changed default. Return ONLY JSON.\n\n${list}`,2000);
+  let air;
+  try{air=JSON.parse(raw.replace(/```json|```/g,'').trim());}
+  catch(e){air=items.map(()=>({zandaCode:'UNRESOLVED',zandaDesc:'',matchType:'unresolved',notes:'parse error',nm:false,cat:'ALL'}));}
+  return items.map((item,i)=>{const a=air[i]||{zandaCode:'UNRESOLVED',zandaDesc:'',matchType:'unresolved',notes:'',nm:false,cat:'ALL'};return{compCode:item.code,compDesc:item.description||'',qty:item.qty,door:item.door||'',zandaCode:a.zandaCode||'UNRESOLVED',zandaDesc:a.zandaDesc||'',matchType:a.matchType||'unresolved',notes:a.notes||'',nm:!!a.nm,cat:a.cat||'ALL'};});
 }
 
-function showApp(user) {
-  currentUser = user;
-  document.getElementById('auth-screen').style.display = 'none';
-  const app = document.getElementById('app');
-  app.style.display = 'flex';
-  const badge = document.getElementById('user-badge');
-  badge.textContent = (user.email || 'U').slice(0,1).toUpperCase();
-  badge.title = user.email;
-  loadHistory();
-  loadLeaderboard();
-}
+const ZC={'DOOR FURNITURE':['10001.BN','10001.GN','10001.BLK','10001.SS','10002.BN','10002.GN','10003.D.BN','10004.3.BN','10004.4.BN','10021.BN','10021.GN','10021.BLK','10022.SS','10023.D.BN','10024.3.BN','10024.4.BN','10026.BN','10026.GN','10051.BN','10051.GN','10052.BN','10054.3.BN','10054.4.BN','10091.BN','10092.BN','10093.D.BN','10094.3.BN','10094.4.BN','7314.BN','7314.GN','7315.PR.BN','7316.3.BN','7316.4.BN','7325.BN','7325.GN','7326.BN','7344.BN','7345.BN','7354.BN','7355.BN','7355.BLK','11019','11020','11020.SC','11021','9613.SS','9610.SS','9660.SS','9662.SS'],'LOCKS & LATCHES':['1450.SS','1450.GN','1450.BLK','1450.EB','1131.SS','1131.BN','1160','1160.BN','1160.SS','1160.GN','10432.SS','10416.SS','10416.BN','7020.O','7020.O.BN','7023','7024','7027'],'HINGES':['5927.SS','5910.SS','5904.SS','5903.SS','5901.SS','5901.SB','5901.GN','5908.SS','5929.SS','5939.SS'],'DOOR CONTROLS':['TS.9205.SRFB.SNP','TS.9205.SRFB.GN','TS.9205.SRSA.SNP','TS.9205.SRSA.GN','TS.9205.FB.SE','TS.9205.SA.SE','TS.8016.FB.SE','TS.8016.SA.SE','TS.8015.CAB.SIL','TS.8024.FB','TS.7004','TS.7306'],'ACCESSORIES':['5256.BN','5256.SS','5256.GN','5256.BLK','14008.BN','14008.GN','14009.BN','5244.BN','5266.SC','10500.BN','10421.SS','10427.SS','10430.SS','10430.BLK','7188.GN','5243','ESV.100','ESV.200','A8SIC32','A8SIC36','A8SIC42','A120S','A120LS','A120DS','A120LDS','10405.SS','10406.SS','10407.SS','11530.SS'],'PULL HANDLES':['7130','7130.BN','7130.SS','13505','7026','7100','7098.BB.BLK','7099.BB','7122.BB.SS'],'SLIDING':['5327']};
+const ZD={'10001.BN':'Epic Return Passage BN','10001.GN':'Epic Return Passage GN','10001.BLK':'Epic Return Passage BLK','10001.SS':'Epic Return Passage SS','10002.BN':'Epic Return Privacy BN','10003.D.BN':'Epic Return Dummy BN','10004.3.BN':'Epic Return Entrance KK BN','10004.4.BN':'Epic Return Entrance KT BN','10021.BN':'Epic Passage BN','10021.GN':'Epic Passage GN','10021.BLK':'Epic Passage BLK','10022.SS':'Epic Privacy SS','10023.D.BN':'Epic Dummy BN','10024.3.BN':'Epic Entrance KK BN','10024.4.BN':'Epic Entrance KT BN','10026.BN':'Epic Sep Privacy BN','10051.BN':'Duke Return Passage BN','10051.GN':'Duke Return Passage GN','10052.BN':'Duke Return Privacy BN','10054.3.BN':'Duke Return Entrance KK BN','10054.4.BN':'Duke Return Entrance KT BN','10091.BN':'Duke Passage BN','10092.BN':'Duke Privacy BN','10093.D.BN':'Duke Dummy BN','10094.3.BN':'Duke Entrance KK BN','10094.4.BN':'Duke Entrance KT BN','7314.BN':'Streamline Passage BN','7314.GN':'Streamline Passage GN','7315.PR.BN':'Streamline Privacy BN','7316.3.BN':'Streamline Entrance KK BN','7316.4.BN':'Streamline Entrance KT BN','7325.BN':'Streamline Apt Entrance BN','7325.GN':'Streamline Apt Entrance GN','7326.BN':'Streamline Apt Privacy BN','7344.BN':'Duke Return Vestibule BN','7345.BN':'Duke Return Apt Entrance BN','7354.BN':'Epic Return Vestibule BN','7355.BN':'Epic Return Apt Entrance BN','7355.BLK':'Epic Return Apt Entrance BLK','11020':'Phoenix Entrance DDA BLK','11020.SC':'Phoenix Entrance DDA SC','11019':'Phoenix Passage SC','11021':'Phoenix Privacy SC','9613.SS':'Bastion External Plate SS','9610.SS':'Bastion Internal Plate SS','9660.SS':'J13 Double Cyl Kit SS','9662.SS':'J13 Cyl Turn Kit SS','1450.SS':'Commercial Mortice Lock FR SS','1450.GN':'Commercial Mortice Lock FR GN','1450.BLK':'Commercial Mortice Lock FR BLK','1450.EB':'Commercial Mortice Lock FR EB','1131.SS':'Tubular Latch 60mm SS','1131.BN':'Tubular Latch 60mm BN','1160':'Oval Cylinder 6 pin','1160.BN':'Oval Cylinder BN','1160.SS':'Oval Cylinder SS','1160.GN':'Oval Cylinder GN','10432.SS':'Night Latch 60mm SS','10416.SS':'Tubular Bolt 60mm SS','10416.BN':'Tubular Bolt 60mm BN','7020.O':'Oval Escutcheon','7020.O.BN':'Round Oval Escutcheon BN','7023':'Escutcheon Disabled Turn','7024':'Escutcheon with Turn','7027':'Emergency Release','5927.SS':'Bearing Hinge 100x100 SS','5910.SS':'Butt Hinge 100x100 SS','5904.SS':'Bearing Hinge 100x75 SS','5903.SS':'Butt Hinge 100x75 SS','5901.SS':'Butt Hinge Loose Pin SS','5901.SB':'Butt Hinge Loose Pin SB','5901.GN':'Butt Hinge Loose Pin GN','5908.SS':'Fast Fix Hinge 100x70 SS','5929.SS':'Lift Off Hinge LH SS','5939.SS':'Lift Off Hinge RH SS','TS.9205.SRFB.SNP':'TS9205 Combined Flat Bar BN','TS.9205.SRFB.GN':'TS9205 Combined Flat Bar GN','TS.9205.SRSA.SNP':'TS9205 Combined Slide Arm BN','TS.9205.SRSA.GN':'TS9205 Combined Slide Arm GN','TS.9205.FB.SE':'TS9205 Standard Flat Bar','TS.9205.SA.SE':'TS9205 Standard Slide Arm','TS.8016.FB.SE':'TS8016 Heavy Flat Bar EN1-6','TS.8016.SA.SE':'TS8016 Heavy Slide Arm EN1-6','TS.8015.CAB.SIL':'TS8015 Cam Action Pull DDA','TS.8024.FB':'Economy Closer EN2-4','TS.7004':'Floor Spring EN4 150kg','TS.7306':'Ultra HD Floor Spring 300kg','5256.BN':'Round Floor Stop BN','5256.SS':'Round Floor Stop SS','5256.GN':'Round Floor Stop GN','5256.BLK':'Round Floor Stop BLK','14008.BN':'Half Moon Floor Stop BN','14008.GN':'Half Moon Floor Stop GN','14009.BN':'Triangular Floor Stop BN','5244.BN':'Round Wall Stop 19mm BN','5266.SC':'Skirting Wall Stop 35mm SC','10500.BN':'Magnetic Door Stop BN','10421.SS':'DDA Privacy Turn Release SS','10427.SS':'Auto Flush Bolt SS','10430.SS':'Push Pull Plates SS','10430.BLK':'Push Pull Plates BLK','7188.GN':'Duke Push Pull Plate GN','5243':'Door Viewer 180°','ESV.100':'Electric Strike 680kg','ESV.200':'Electric Strike Non-Monitored','A8SIC32':'Raven Door Bottom 820mm','A8SIC36':'Raven Door Bottom 920mm','A8SIC42':'Raven Door Bottom 1070mm','A120S':'Raven Single Perim Set','A120LS':'Raven Long Single Perim Set','A120DS':'Raven Double Perim Set','A120LDS':'Raven Long Double Perim Set','7130':'Nitro Pull Handle 600mm','7130.BN':'Nitro Pull Handle BN','7130.SS':'Nitro Pull Handle SS','13505':'Toorak Pull Handle','7026':'Round Profile Pull Handle','7100':'Polo Pull Handle 560mm','7098.BB.BLK':'Polo Pull Handle 450mm B2B BLK','7099.BB':'Polo Pull Handle 450mm B2B','7122.BB.SS':'Square Section Offset Pull Handle SS','5327':'Round Cavity Suite Privacy','10405.SS':'Panic Bolt 300mm SS','10406.SS':'Offset Panic Bolt 450mm SS','10407.SS':'Panic Bolt 600mm SS','11530.SS':'Strike Shield Plate SS'};
+ZC['ALL']=Object.values(ZC).flat();
+function getCOpts(cat){return(ZC[cat]||ZC['ALL']).map(k=>`<option value="${k}">${k} — ${ZD[k]||''}</option>`).join('');}
 
-function showAuthScreen() {
-  currentUser = null;
-  document.getElementById('auth-screen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
+function badge(r){
+  if(r.nm)return`<span class="badge bn2">notes-driven</span>`;
+  const m={confirmed:'bc',suggested:'bs',unresolved:'bu',by_others:'bb',user:'buser'};
+  const l={confirmed:'confirmed',suggested:'ai suggestion',unresolved:'unresolved',by_others:'by others',user:'user selected'};
+  return`<span class="badge ${m[r.matchType]||'bu'}">${l[r.matchType]||r.matchType}</span>`;
 }
-
-document.getElementById('btn-magic-link').addEventListener('click', async () => {
-  const email = document.getElementById('auth-email').value.trim();
-  const msg = document.getElementById('auth-msg');
-  if (!email) { msg.textContent = 'Enter your email first.'; return; }
-  msg.textContent = 'Sending…';
-  const { error } = await sb.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: location.href }
+function render(res,notes){
+  const area=document.getElementById('results');
+  const conf=res.filter(r=>r.matchType==='confirmed'&&!r.nm).length;
+  const nd=res.filter(r=>r.nm).length;
+  const sug=res.filter(r=>r.matchType==='suggested'&&!r.nm).length;
+  const unr=res.filter(r=>r.matchType==='unresolved'||r.matchType==='by_others').length;
+  let h=`<div class="scards"><div class="sc"><div class="sn">${res.length}</div><div class="sl">Total lines</div></div><div class="sc"><div class="sn" style="color:var(--green)">${conf}</div><div class="sl">Confirmed</div></div><div class="sc"><div class="sn" style="color:var(--gold3)">${nd}</div><div class="sl">Notes-driven</div></div><div class="sc"><div class="sn" style="color:var(--blue)">${sug}</div><div class="sl">AI suggestions</div></div><div class="sc"><div class="sn" style="color:var(--amber)">${unr}</div><div class="sl">Needs review</div></div></div>`;
+  if(notes)h+=`<div class="nbanner"><strong>Project notes applied</strong>${esc(notes)}</div>`;
+  h+=`<div class="tw"><table><thead><tr><th style="width:110px">Competitor code</th><th style="width:145px">Competitor description</th><th style="width:65px">Door/ref</th><th style="width:36px;text-align:right">Qty</th><th style="width:155px">Zanda code</th><th style="width:165px">Zanda description</th><th style="width:115px">Match type</th><th>Notes</th></tr></thead><tbody>`;
+  res.forEach((r,idx)=>{
+    const isU=r.matchType==='unresolved';
+    const zc=isU?`<select onchange="pick(${idx},this.value)"><option value="">— select —</option>${getCOpts(r.cat||'ALL')}</select>`:`<span class="mono">${esc(r.zandaCode)}</span>`;
+    h+=`<tr class="${r.nm?'nm':''}"><td><span class="mono">${esc(r.compCode)}</span></td><td class="muted">${esc(r.compDesc||'')}</td><td class="muted">${esc(r.door||'')}</td><td style="text-align:right;font-weight:700">${r.qty}</td><td>${zc}</td><td class="muted">${esc(r.zandaDesc||'')}</td><td>${badge(r)}</td><td><span class="muted it">${esc(r.notes||'')}</span></td></tr>`;
   });
-  if (error) { msg.textContent = error.message; }
-  else { msg.textContent = '✓ Check your email for the sign-in link.'; }
-});
-
-document.getElementById('btn-ms-sso').addEventListener('click', async () => {
-  document.getElementById('auth-msg').textContent = 'Microsoft SSO not yet configured.';
-});
-
-document.getElementById('btn-signout').addEventListener('click', async () => {
-  await sb.auth.signOut();
-});
-
-// ═══════════════════════════════════════════════════════
-// NAV TABS
-// ═══════════════════════════════════════════════════════
-document.querySelectorAll('.nav-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  h+=`</tbody></table></div>`;
+  if(flags.length){h+=`<div class="fbox"><div class="fh">Flags — by others / needs attention</div>`;flags.forEach(f=>{h+=`<div class="fi"><span class="fico">⚑</span><span><strong>${esc(f.code)}</strong> — ${esc(f.reason)}</span></div>`;});h+=`</div>`;}
+  h+=`<div class="dlrow"><button class="btn btn-p" onclick="dlPM()">↓ Promaster CSV</button><button class="btn btn-g" onclick="dlBC()">↓ BC Quote CSV</button></div>`;
+  area.innerHTML=h;
+}
+async function pick(idx,code){
+  if(!code)return;
+  results[idx].zandaCode=code;results[idx].zandaDesc=ZD[code]||code;results[idx].matchType='user';results[idx].nm=false;
+  await storeSub(results[idx]);logUse('confirm_sub',null,null);
+  render(results,document.getElementById('ntxt').value.trim());
+}
+function dlPM(){
+  const rows=[['PartCode','Description','BrandName','FinishShort','ProductQuantity']];
+  results.filter(r=>r.zandaCode&&r.zandaCode!=='UNRESOLVED').forEach(r=>{
+    const fin=r.zandaCode.includes('.')?r.zandaCode.split('.').pop():'';
+    const brand=r.zandaCode.startsWith('A8SIC')||r.zandaCode.startsWith('A120')?'Raven':'Zanda';
+    rows.push([r.zandaCode,r.zandaDesc||'',brand,fin,r.qty]);
   });
-});
-
-// Input mode switcher (file vs paste)
-document.querySelectorAll('.tab-switch').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-switch').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeInputMode = btn.dataset.input;
-    document.getElementById('input-file').style.display = activeInputMode === 'file' ? '' : 'none';
-    document.getElementById('input-paste').style.display = activeInputMode === 'paste' ? '' : 'none';
-  });
-});
-
-// ═══════════════════════════════════════════════════════
-// FILE UPLOAD & QUEUE
-// ═══════════════════════════════════════════════════════
-const dropZone = document.getElementById('drop-zone');
-const fileInput = document.getElementById('file-input');
-
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  addFiles(Array.from(e.dataTransfer.files));
-});
-fileInput.addEventListener('change', () => {
-  addFiles(Array.from(fileInput.files));
-  fileInput.value = '';
-});
-
-function addFiles(files) {
-  for (const f of files) {
-    const ext = f.name.split('.').pop().toLowerCase();
-    if (!['pdf', 'xlsx', 'xls', 'csv', 'txt'].includes(ext)) {
-      toast(`Skipped ${f.name} — unsupported format`, 'error');
-      continue;
-    }
-    // Deduplicate by name
-    if (fileQueue.find(q => q.name === f.name)) {
-      toast(`${f.name} already added`);
-      continue;
-    }
-    fileQueue.push({ id: uid(), file: f, name: f.name, ext, status: 'pending', text: null, error: null });
-  }
-  renderQueue();
-  document.getElementById('extraction-types').style.display = fileQueue.length ? 'block' : 'none';
+  logUse('download_promaster',results.length,null);dlCSV(rows,'blackbeard_promaster.csv');
 }
-
-function removeFile(id) {
-  fileQueue = fileQueue.filter(f => f.id !== id);
-  renderQueue();
-  document.getElementById('extraction-types').style.display = fileQueue.length ? 'block' : 'none';
+function dlBC(){
+  const rows=[['No.','Quantity']];
+  results.filter(r=>r.zandaCode&&r.zandaCode!=='UNRESOLVED').forEach(r=>rows.push([r.zandaCode,r.qty]));
+  logUse('download_bc',results.length,null);dlCSV(rows,'blackbeard_bc_quote.csv');
 }
-
-function renderQueue() {
-  const el = document.getElementById('file-queue');
-  if (!fileQueue.length) { el.innerHTML = ''; return; }
-  el.innerHTML = fileQueue.map(f => `
-    <div class="file-item ${f.status === 'error' ? 'error' : f.status === 'done' ? 'done' : f.status === 'extracting' ? 'processing' : ''}" id="fitem-${f.id}">
-      <span class="file-icon">${fileIcon(f.ext)}</span>
-      <div class="file-info">
-        <div class="file-name">${f.name}</div>
-        <div class="file-status ${f.status === 'error' ? 'error' : f.status === 'done' ? 'done' : ''}">
-          ${f.status === 'pending' ? formatBytes(f.file.size) :
-            f.status === 'extracting' ? '⟳ Extracting text…' :
-            f.status === 'done' ? `✓ ${f.text ? (f.text.length).toLocaleString() + ' chars extracted' : 'Ready'}` :
-            f.status === 'error' ? `✗ ${f.error}` : f.status}
-        </div>
-      </div>
-      <button class="file-remove" onclick="removeFile('${f.id}')" title="Remove">✕</button>
-    </div>
-  `).join('');
+function dlCSV(rows,fn){
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=fn;a.click();
 }
-
-// ═══════════════════════════════════════════════════════
-// TEXT EXTRACTION — calls Edge Function /extract
-// ═══════════════════════════════════════════════════════
-async function extractFiles() {
-  const pending = fileQueue.filter(f => f.status === 'pending' || f.status === 'error');
-  if (!pending.length) return;
-
-  const fd = new FormData();
-  for (const f of pending) {
-    f.status = 'extracting';
-    fd.append('files', f.file, f.name);
-  }
-  renderQueue();
-
-  try {
-    const resp = await fetch(`${EDGE_BASE}/extract`, {
-      method: 'POST',
-      headers: { 'apikey': SUPABASE_ANON, 'authorization': `Bearer ${(await sb.auth.getSession()).data.session?.access_token || SUPABASE_ANON}` },
-      body: fd,
-    });
-
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({ error: resp.statusText }));
-      throw new Error(err.error || resp.statusText);
-    }
-
-    const data = await resp.json();
-    for (const result of (data.files || [])) {
-      const q = fileQueue.find(f => f.name === result.name);
-      if (!q) continue;
-      if (result.error) {
-        q.status = 'error';
-        q.error = result.error;
-      } else {
-        q.status = 'done';
-        q.text = result.text;
-      }
-    }
-  } catch (e) {
-    // Edge function /extract not yet deployed - fall back to local extraction for CSVs/text
-    for (const f of pending) {
-      if (f.ext === 'csv' || f.ext === 'txt') {
-        try {
-          f.text = await f.file.text();
-          f.status = 'done';
-        } catch {
-          f.status = 'error';
-          f.error = 'Could not read file';
-        }
-      } else {
-        f.status = 'error';
-        f.error = `Server extraction unavailable: ${e.message}. Redeploy the Edge Function.`;
-      }
-    }
-  }
-  renderQueue();
-}
-
-// ═══════════════════════════════════════════════════════
-// QUICK TAGS
-// ═══════════════════════════════════════════════════════
-document.querySelectorAll('.quick-tag').forEach(tag => {
-  tag.addEventListener('click', () => {
-    const note = tag.dataset.note;
-    const ta = document.getElementById('notes-input');
-    const selected = tag.classList.toggle('selected');
-    if (selected) {
-      ta.value = ta.value ? ta.value.trimEnd() + '\n' + note : note;
-    } else {
-      ta.value = ta.value.split('\n').filter(l => l !== note).join('\n');
-    }
-  });
-});
-
-// ═══════════════════════════════════════════════════════
-// CSV TAB SWITCHER
-// ═══════════════════════════════════════════════════════
-document.querySelectorAll('.csv-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.csv-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.csv-pane').forEach(p => p.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('csv-' + tab.dataset.csv).classList.add('active');
-  });
-});
-
-// ═══════════════════════════════════════════════════════
-// PARSE CSV BLOCKS FROM CLAUDE RESPONSE
-// ═══════════════════════════════════════════════════════
-function parseCsvBlocks(text) {
-  const pmMatch = text.match(/===PROMASTER_CSV===([\s\S]*?)(?:===BC_CSV===|$)/);
-  const bcMatch = text.match(/===BC_CSV===([\s\S]*?)(?:===|$)/);
-  return {
-    promaster: pmMatch ? pmMatch[1].trim() : '',
-    bc: bcMatch ? bcMatch[1].trim() : '',
-  };
-}
-
-function downloadCsv(content, filename) {
-  const blob = new Blob([content], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename; a.click();
-  URL.revokeObjectURL(url);
-}
-
-// ═══════════════════════════════════════════════════════
-// MAIN PROCESS HANDLER
-// ═══════════════════════════════════════════════════════
-document.getElementById('btn-process').addEventListener('click', processSchedule);
-
-async function processSchedule() {
-  const btn = document.getElementById('btn-process');
-  const resultArea = document.getElementById('result-area');
-  const resultContent = document.getElementById('result-content');
-  const statusBox = document.getElementById('status-box');
-  const csvSection = document.getElementById('csv-section');
-
-  // Reset
-  resultArea.classList.remove('visible');
-  statusBox.classList.remove('visible');
-  csvSection.style.display = 'none';
-  lastPromaster = ''; lastBcCsv = '';
-
-  let scheduleText = '';
-
-  // ── Collect input ──
-  if (activeInputMode === 'paste') {
-    scheduleText = document.getElementById('paste-input').value.trim();
-    if (!scheduleText) { toast('Paste some schedule text first', 'error'); return; }
-
-    setStep([
-      { state: 'done', label: 'Input: pasted text' },
-      { state: 'active', label: 'Sending to Claude…' },
-    ]);
-  } else {
-    // File mode
-    if (!fileQueue.length) { toast('Add at least one file', 'error'); return; }
-
-    // Extract any pending files
-    const needsExtract = fileQueue.filter(f => f.status === 'pending');
-    if (needsExtract.length) {
-      setStep([
-        { state: 'active', label: `Extracting text from ${needsExtract.length} file(s)…` },
-        { state: 'wait', label: 'Sending to Claude…' },
-      ]);
-      setProgress(10);
-      await extractFiles();
-    }
-
-    // Check for errors
-    const errored = fileQueue.filter(f => f.status === 'error');
-    const ok = fileQueue.filter(f => f.status === 'done' && f.text);
-
-    if (!ok.length) {
-      setStep([
-        { state: 'error', label: 'No files could be extracted. See errors above.' }
-      ]);
-      return;
-    }
-
-    // Merge all file texts
-    const parts = ok.map(f => `=== FILE: ${f.name} ===\n${f.text}`);
-    if (errored.length) {
-      parts.push(`\n[NOTE: ${errored.length} file(s) could not be extracted: ${errored.map(e => e.name).join(', ')}]`);
-    }
-    scheduleText = parts.join('\n\n');
-
-    setStep([
-      { state: 'done', label: `${ok.length} file(s) extracted (${(scheduleText.length/1000).toFixed(0)}k chars)` },
-      { state: 'active', label: 'Sending to Claude…' },
-    ]);
-    setProgress(40);
-  }
-
-  const notes = document.getElementById('notes-input').value.trim();
-  const userMessage = notes
-    ? `PROJECT INSTRUCTIONS:\n${notes}\n\nSCHEDULE DATA:\n${scheduleText}`
-    : `SCHEDULE DATA:\n${scheduleText}`;
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Processing…';
-
-  try {
-    // ── Call Claude ──
-    const resp = await fetch(EDGE_BASE, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_ANON,
-        'authorization': `Bearer ${(await sb.auth.getSession()).data.session?.access_token || SUPABASE_ANON}`,
-      },
-      body: JSON.stringify({
-        system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: userMessage }],
-        max_tokens: 4000,
-      }),
-    });
-
-    setProgress(80);
-
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({ error: resp.statusText }));
-      throw new Error(err.error || resp.statusText);
-    }
-
-    const data = await resp.json();
-    if (data.error) throw new Error(data.error);
-
-    const responseText = data.text || '';
-
-    setStep([
-      { state: 'done', label: 'Text extracted from files' },
-      { state: 'done', label: 'Claude analysis complete' },
-    ]);
-    setProgress(100);
-
-    // Parse CSV blocks
-    const csvs = parseCsvBlocks(responseText);
-    lastPromaster = csvs.promaster;
-    lastBcCsv = csvs.bc;
-
-    // Show analysis (strip CSV blocks from display)
-    const displayText = responseText
-      .replace(/===PROMASTER_CSV===[\s\S]*?(===BC_CSV===|$)/, '')
-      .replace(/===BC_CSV===[\s\S]*$/, '')
-      .trim();
-
-    resultContent.textContent = displayText;
-    resultArea.classList.add('visible');
-
-    // Show CSV section if we got output
-    if (lastPromaster || lastBcCsv) {
-      csvSection.style.display = 'block';
-      document.getElementById('rows-promaster').textContent = lastPromaster || '(no data)';
-      document.getElementById('rows-bc').textContent = lastBcCsv || '(no data)';
-    }
-
-    // Save to Supabase
-    if (currentUser) {
-      try {
-        const fileNames = activeInputMode === 'file' 
-          ? fileQueue.filter(f => f.status === 'done').map(f => f.name).join(', ')
-          : 'pasted text';
-        await sb.from('substitutions').insert({
-          user_id: currentUser.id,
-          input_summary: fileNames,
-          response_text: responseText,
-          promaster_csv: lastPromaster,
-          bc_csv: lastBcCsv,
-          notes: notes || null,
-        }).select();
-      } catch { /* non-fatal */ }
-      // Log usage
-      try {
-        await sb.from('usage_log').insert({
-          user_id: currentUser.id,
-          action: 'process_schedule',
-          tokens_used: data.usage?.input_tokens + data.usage?.output_tokens || 0,
-        });
-      } catch { /* non-fatal */ }
-    }
-
-    toast('Done ✓', 'success');
-
-  } catch (e) {
-    setStep([
-      { state: 'done', label: 'Files extracted' },
-      { state: 'error', label: `Claude error: ${e.message}` },
-    ]);
-    toast(e.message, 'error');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Process schedule';
-    setProgress(0);
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-// COPY / DOWNLOAD
-// ═══════════════════════════════════════════════════════
-document.getElementById('btn-copy-analysis').addEventListener('click', () => {
-  const text = document.getElementById('result-content').textContent;
-  navigator.clipboard.writeText(text).then(() => toast('Copied ✓', 'success'));
-});
-
-document.getElementById('btn-dl-promaster').addEventListener('click', () => {
-  if (lastPromaster) downloadCsv(lastPromaster, 'zanda_promaster.csv');
-  else toast('No Promaster CSV to download', 'error');
-});
-
-document.getElementById('btn-dl-bc').addEventListener('click', () => {
-  if (lastBcCsv) downloadCsv(lastBcCsv, 'zanda_bc_quote.csv');
-  else toast('No BC CSV to download', 'error');
-});
-
-// ═══════════════════════════════════════════════════════
-// CLEAR
-// ═══════════════════════════════════════════════════════
-document.getElementById('btn-clear').addEventListener('click', () => {
-  fileQueue = [];
-  renderQueue();
-  document.getElementById('paste-input').value = '';
-  document.getElementById('notes-input').value = '';
-  document.querySelectorAll('.quick-tag').forEach(t => t.classList.remove('selected'));
-  document.getElementById('result-area').classList.remove('visible');
-  document.getElementById('status-box').classList.remove('visible');
-  document.getElementById('csv-section').style.display = 'none';
-  document.getElementById('extraction-types').style.display = 'none';
-  lastPromaster = ''; lastBcCsv = '';
-});
-
-// ═══════════════════════════════════════════════════════
-// HISTORY
-// ═══════════════════════════════════════════════════════
-async function loadHistory() {
-  const el = document.getElementById('history-list');
-  try {
-    const { data, error } = await sb
-      .from('substitutions')
-      .select('id, created_at, input_summary, response_text, notes')
-      .order('created_at', { ascending: false })
-      .limit(50);
-
-    if (error || !data?.length) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📜</div><p>No schedules processed yet.</p></div>';
-      return;
-    }
-
-    el.innerHTML = data.map(row => `
-      <div class="history-card" onclick="loadHistoryItem('${row.id}')">
-        <div class="history-meta">
-          <span class="history-date">${new Date(row.created_at).toLocaleString('en-AU', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
-          ${row.notes ? `<span class="history-files" title="${row.notes}">📝 Notes</span>` : ''}
-        </div>
-        <div class="history-files">${row.input_summary || 'Schedule'}</div>
-        <div class="history-preview">${(row.response_text || '').slice(0, 180).replace(/\n/g, ' ')}…</div>
-      </div>
-    `).join('');
-  } catch {
-    el.innerHTML = '<div class="empty-state"><p>Could not load history.</p></div>';
-  }
-}
-
-async function loadHistoryItem(id) {
-  const { data } = await sb.from('substitutions').select('*').eq('id', id).single();
-  if (!data) return;
-
-  // Switch to process tab and populate result
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelector('[data-tab="process"]').classList.add('active');
-  document.getElementById('tab-process').classList.add('active');
-
-  const displayText = (data.response_text || '')
-    .replace(/===PROMASTER_CSV===[\s\S]*?(===BC_CSV===|$)/, '')
-    .replace(/===BC_CSV===[\s\S]*$/, '')
-    .trim();
-
-  document.getElementById('result-content').textContent = displayText;
-  document.getElementById('result-area').classList.add('visible');
-
-  lastPromaster = data.promaster_csv || '';
-  lastBcCsv = data.bc_csv || '';
-  if (lastPromaster || lastBcCsv) {
-    document.getElementById('csv-section').style.display = 'block';
-    document.getElementById('rows-promaster').textContent = lastPromaster || '(no data)';
-    document.getElementById('rows-bc').textContent = lastBcCsv || '(no data)';
-  }
-  toast('Loaded from history');
-}
-window.loadHistoryItem = loadHistoryItem;
-
-// ═══════════════════════════════════════════════════════
-// LEADERBOARD
-// ═══════════════════════════════════════════════════════
-async function loadLeaderboard() {
-  const el = document.getElementById('lb-content');
-  try {
-    const { data } = await sb
-      .from('usage_log')
-      .select('user_id, action')
-      .eq('action', 'process_schedule');
-
-    if (!data?.length) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏆</div><p>No activity yet.</p></div>';
-      return;
-    }
-
-    const counts = {};
-    for (const row of data) {
-      counts[row.user_id] = (counts[row.user_id] || 0) + 1;
-    }
-
-    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 10);
-    const medals = ['🥇','🥈','🥉'];
-
-    el.innerHTML = `<table class="lb-table">
-      <thead><tr><th>Rank</th><th>User</th><th>Schedules</th></tr></thead>
-      <tbody>${sorted.map(([uid, count], i) =>
-        `<tr>
-          <td class="lb-rank">${medals[i] || '#' + (i+1)}</td>
-          <td>${uid.slice(0,8)}…</td>
-          <td>${count}</td>
-        </tr>`
-      ).join('')}</tbody>
-    </table>`;
-  } catch {
-    el.innerHTML = '<div class="empty-state"><p>Could not load leaderboard.</p></div>';
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-// BOOT
-// ═══════════════════════════════════════════════════════
-initAuth();
+init();
 </script>
 </body>
 </html>
