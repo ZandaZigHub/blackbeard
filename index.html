@@ -350,10 +350,19 @@ async function readPDF(f){
   setSt('Reading PDF…',true);
   const r=new FileReader();
   r.onload=async e=>{
-    const bytes=new Uint8Array(e.target.result);let b64='';const chunk=8192;
-    for(let i=0;i<bytes.length;i+=chunk)b64+=btoa(String.fromCharCode(...bytes.subarray(i,Math.min(i+chunk,bytes.length))));
     try{
-      const txt=await ai('Extract all text from this document exactly.',[{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},{type:'text',text:'Extract all text. Plain text only.'}],3000);
+      const bytes=new Uint8Array(e.target.result);
+      let b64='';
+      // Process in smaller chunks to avoid stack overflow
+      const chunkSize=1024;
+      for(let i=0;i<bytes.length;i+=chunkSize){
+        const chunk=bytes.subarray(i,Math.min(i+chunkSize,bytes.length));
+        b64+=String.fromCharCode.apply(null,chunk);
+      }
+      b64=btoa(b64);
+      const txt=await ai('Extract all text from this door hardware schedule PDF exactly as written. Output plain text only, preserving all product codes and quantities.',
+        [{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},
+         {type:'text',text:'Extract all text exactly as written. Plain text only.'}],3000);
       fileText=txt;showPrev(txt);setSt('',false);
     }catch(err){setSt('PDF error: '+err.message,false);}
   };r.readAsArrayBuffer(f);
