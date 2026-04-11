@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blackbeard</title>
+<title>Blackbeard — Zanda</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -13,7 +13,8 @@
   --navy:#383d4f;--navy2:#4a5168;--navy3:#2a2f3d;
   --gold:#bab28f;--gold2:#d4ccaa;--gold3:#9a9275;
   --light:#f5f5f5;--white:#fff;--text:#383d4f;--muted:#888;--border:#e2e2de;
-  --green:#2a7a4a;--blue:#2d5a8e;--amber:#b8860b;
+  --green:#2a7a4a;--green2:#e8f5ee;--blue:#2d5a8e;--blue2:#eaf0f8;
+  --amber:#b8860b;--amber2:#fdf5e6;--red:#c0392b;--red2:#fdf0f0;
   --font:'Montserrat',Arial,sans-serif;--r:6px;--rl:10px;
 }
 body{font-family:var(--font);background:var(--light);color:var(--text);min-height:100vh;font-size:14px}
@@ -29,10 +30,9 @@ body{font-family:var(--font);background:var(--light);color:var(--text);min-heigh
 .auth-input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:13px;color:var(--text);outline:none;margin-bottom:10px}
 .auth-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(186,178,143,.15)}
 .auth-btn{width:100%;padding:11px;background:var(--navy);border:none;border-radius:var(--r);color:var(--white);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.03em;transition:background .15s}
-.auth-btn:hover{background:var(--navy2)}
-.auth-btn:disabled{opacity:.5;cursor:not-allowed}
+.auth-btn:hover{background:var(--navy2)}.auth-btn:disabled{opacity:.5;cursor:not-allowed}
 .auth-msg{margin-top:10px;font-size:12px;text-align:center;color:var(--muted);min-height:18px}
-.auth-msg.ok{color:var(--green)}.auth-msg.err{color:#c0392b}
+.auth-msg.ok{color:var(--green)}.auth-msg.err{color:var(--red)}
 .auth-or{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--muted);font-size:11px}
 .auth-or::before,.auth-or::after{content:'';flex:1;height:1px;background:var(--border)}
 .ms-btn{width:100%;padding:10px;background:var(--white);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:border-color .15s}
@@ -40,7 +40,7 @@ body{font-family:var(--font);background:var(--light);color:var(--text);min-heigh
 .ms-icon{width:16px;height:16px;display:grid;grid-template-columns:1fr 1fr;gap:1.5px}
 .ms-icon span{display:block;border-radius:1px}
 #app{display:none;flex-direction:column;min-height:100vh}
-.bar{background:var(--navy);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:100}
+.bar{background:var(--navy);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;position:sticky;top:0;z-index:200}
 .bar-title{font-size:15px;font-weight:700;color:var(--white);letter-spacing:.08em;text-transform:uppercase}
 .bar-title span{color:var(--gold)}
 .bar-right{display:flex;align-items:center;gap:10px}
@@ -49,17 +49,17 @@ body{font-family:var(--font);background:var(--light);color:var(--text);min-heigh
 .out-btn{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.55);font-family:var(--font);font-size:11px;cursor:pointer;padding:4px 9px;border-radius:4px}
 .out-btn:hover{color:var(--white);border-color:rgba(255,255,255,.4)}
 .gold-bar{height:3px;background:linear-gradient(90deg,var(--gold3),var(--gold2),var(--gold3))}
-.main{flex:1;padding:1.5rem;max-width:1400px;width:100%;margin:0 auto}
+.main{flex:1;padding:1.5rem;max-width:1500px;width:100%;margin:0 auto}
 .ptabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.25rem}
 .ptab{font-size:12px;font-weight:600;padding:8px 18px;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--muted);cursor:pointer;font-family:var(--font);letter-spacing:.04em;margin-bottom:-1px;transition:all .1s}
 .ptab.active{color:var(--navy);border-bottom-color:var(--gold)}
+.ptab:hover:not(.active){color:var(--navy2)}
 .pp{display:none}.pp.active{display:block}
-.card{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:0 1px 4px rgba(56,61,79,.06)}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:0 1px 4px rgba(56,61,79,.06);margin-bottom:1rem}
 .ch{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--light);border-bottom:1px solid var(--border)}
 .ct{font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.1em}
 .chint{font-size:10px;color:var(--muted)}
 .igrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
-@media(max-width:768px){.igrid{grid-template-columns:1fr}}
 .tabs{display:flex;border-bottom:1px solid var(--border)}
 .tab{font-size:11px;font-weight:600;padding:7px 15px;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--muted);cursor:pointer;font-family:var(--font);letter-spacing:.04em;margin-bottom:-1px}
 .tab.active{color:var(--navy);border-bottom-color:var(--gold)}
@@ -75,7 +75,13 @@ body{font-family:var(--font);background:var(--light);color:var(--text);min-heigh
 .fprev{font-size:10px;font-family:monospace;color:var(--muted);background:var(--light);border-top:1px solid var(--border);padding:7px 12px;max-height:50px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
 textarea{width:100%;background:var(--white);color:var(--text);border:none;font-size:12px;font-family:var(--font);padding:10px 12px;resize:vertical;line-height:1.6;outline:none}
 textarea::placeholder{color:var(--muted)}
-.nta{min-height:132px}
+.nta{min-height:100px}
+.preopts{background:#faf9f5;border:1px solid var(--gold);border-radius:var(--r);padding:12px 14px;margin-bottom:1rem}
+.preopts-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold3);margin-bottom:10px}
+.preopts-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.preopts-field label{font-size:10px;font-weight:600;color:var(--navy);display:block;margin-bottom:4px}
+.preopts-field select{width:100%;padding:6px 9px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:11px;color:var(--text);background:var(--white);outline:none}
+.preopts-field select:focus{border-color:var(--gold)}
 .chips{padding:8px 12px;border-top:1px solid var(--border);background:var(--light);display:flex;flex-wrap:wrap;gap:4px;align-items:center}
 .chlbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-right:2px}
 .chip{font-size:10px;padding:3px 9px;border-radius:20px;border:1px solid var(--border);background:var(--white);color:var(--navy);cursor:pointer;font-family:var(--font);font-weight:500}
@@ -85,45 +91,82 @@ textarea::placeholder{color:var(--muted)}
 .btn:hover{background:var(--light)}.btn:active{transform:scale(.98)}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
 .btn-p{background:var(--navy);border-color:var(--navy);color:var(--white)}.btn-p:hover{background:var(--navy2)}
 .btn-g{background:var(--gold);border-color:var(--gold3);color:var(--navy)}.btn-g:hover{background:var(--gold2)}
+.btn-green{background:var(--green);border-color:var(--green);color:var(--white)}.btn-green:hover{background:#235f3c}
+.btn-sm{padding:5px 11px;font-size:10px}
 .smsg{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
 .spin{width:13px;height:13px;border:2px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
-.scards{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:1rem}
-.sc{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px}
-.sn{font-size:22px;font-weight:700;line-height:1;color:var(--navy)}
+.scards{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:1rem}
+.sc{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center}
+.sn{font-size:24px;font-weight:700;line-height:1;color:var(--navy)}
 .sl{font-size:9px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
-.nbanner{background:#faf9f5;border:1px solid var(--gold);border-left:3px solid var(--gold);border-radius:var(--r);padding:10px 14px;margin-bottom:1rem;font-size:11px;color:var(--navy);line-height:1.6;white-space:pre-wrap}
+.sc-wow{border-color:var(--green);background:var(--green2)}.sc-wow .sn{color:var(--green)}
+.sc-review{border-color:var(--amber);background:var(--amber2)}.sc-review .sn{color:var(--amber)}
+.nbanner{background:#faf9f5;border:1px solid var(--gold);border-left:3px solid var(--gold);border-radius:var(--r);padding:10px 14px;margin-bottom:.75rem;font-size:11px;color:var(--navy);line-height:1.6}
 .nbanner strong{display:block;margin-bottom:3px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold3)}
 .tw{overflow-x:auto;border:1px solid var(--border);border-radius:var(--rl)}
-table{width:100%;border-collapse:collapse;font-size:11px;min-width:760px;background:var(--white)}
+table{width:100%;border-collapse:collapse;font-size:11px;min-width:820px;background:var(--white)}
 thead{background:var(--navy)}
 th{padding:9px 10px;text-align:left;font-weight:700;font-size:9px;color:rgba(255,255,255,.65);border-bottom:1px solid var(--navy3);white-space:nowrap;text-transform:uppercase;letter-spacing:.08em}
-td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.4}
+td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:middle;line-height:1.4}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:#fafaf8}
-tbody tr.nm td{background:#faf9f5}
-tbody tr.nm td:first-child{border-left:2px solid var(--gold)}
+tbody tr.nm-row td{background:#faf9f5}
+tbody tr.nm-row td:first-child{border-left:2px solid var(--gold)}
+tbody tr.confirmed-row td{background:#f4fbf7}
 .badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:20px;font-weight:700;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
-.bc{background:#e8f5ee;color:#2a7a4a;border:1px solid #b8dfc8}
-.bs{background:#eaf0f8;color:#2d5a8e;border:1px solid #b8cfe8}
+.bc{background:var(--green2);color:var(--green);border:1px solid #b8dfc8}
+.bs{background:var(--blue2);color:var(--blue);border:1px solid #b8cfe8}
 .bn2{background:#faf9f0;color:#8a7a2a;border:1px solid var(--gold)}
-.bu{background:#fdf5e6;color:#8a6a0a;border:1px solid #e8cc88}
-.bb{background:#fdf0f0;color:#8a2a2a;border:1px solid #e8b8b8}
+.bu{background:var(--amber2);color:var(--amber);border:1px solid #e8cc88}
+.bb{background:var(--red2);color:var(--red);border:1px solid #e8b8b8}
 .buser{background:#f0f0fa;color:#4a3a9a;border:1px solid #c8c0e8}
-.mono{font-family:monospace;font-size:10px;color:var(--navy);font-weight:600}
+.bstaked{background:var(--green2);color:var(--green);border:1px solid #b8dfc8}
+.mono{font-family:monospace;font-size:10px;color:var(--navy);font-weight:600;cursor:pointer;padding:2px 4px;border-radius:3px;transition:background .1s}
+.mono:hover{background:var(--blue2);color:var(--blue)}
 .muted{color:var(--muted);font-size:10px}.it{font-style:italic}
-select{font-size:10px;font-family:monospace;padding:3px 7px;border-radius:4px;border:1px solid var(--border);background:var(--white);color:var(--navy);max-width:200px}
+.zanda-cell{position:relative;min-width:170px}
+.ta-wrap{position:relative}
+.ta-input{width:100%;padding:4px 8px;border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:10px;color:var(--navy);outline:none;background:var(--white);transition:border-color .1s}
+.ta-input:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(186,178,143,.2)}
+.ta-drop{position:absolute;top:100%;left:0;right:0;background:var(--white);border:1px solid var(--border);border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:300;max-height:200px;overflow-y:auto;margin-top:2px}
+.ta-opt{padding:5px 8px;cursor:pointer;font-size:10px;line-height:1.3;border-bottom:1px solid var(--border)}
+.ta-opt:last-child{border-bottom:none}
+.ta-opt:hover,.ta-opt.sel{background:var(--light)}
+.ta-code{font-family:monospace;font-weight:700;color:var(--navy)}
+.ta-desc{color:var(--muted);margin-left:4px;font-size:9px}
+.confirm-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;border:1px solid var(--amber);background:var(--amber2);color:var(--amber);font-size:9px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;margin-top:4px;transition:all .15s}
+.confirm-btn:hover{background:var(--amber);color:var(--white)}
+.confirm-btn.staked{border-color:var(--green);background:var(--green2);color:var(--green);cursor:default}
+.conf-meta{font-size:9px;color:var(--muted);margin-top:2px;font-style:italic}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border-radius:var(--rl);box-shadow:0 20px 60px rgba(0,0,0,.3);width:100%;max-width:520px;overflow:hidden;animation:mfade .15s ease;max-height:90vh;overflow-y:auto}
+@keyframes mfade{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.modal-head{background:var(--navy);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0}
+.modal-title{font-size:13px;font-weight:700;color:var(--white);letter-spacing:.04em;font-family:monospace}
+.modal-close{background:transparent;border:none;color:rgba(255,255,255,.5);font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
+.modal-close:hover{color:var(--white)}
+.modal-body{padding:16px}
+.brief-code{font-family:monospace;font-size:12px;font-weight:700;color:var(--navy);background:var(--light);padding:4px 10px;border-radius:4px;display:inline-block;margin-bottom:8px}
+.brief-desc{font-size:12px;color:var(--text);line-height:1.7;margin-bottom:12px;white-space:pre-wrap}
+.brief-img-link{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--blue);text-decoration:none;border:1px solid var(--blue2);padding:5px 12px;border-radius:4px;margin-bottom:14px;transition:background .1s}
+.brief-img-link:hover{background:var(--blue2)}
+.brief-known{border-top:1px solid var(--border);padding-top:12px}
+.brief-known-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px}
+.brief-sub{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--light);border-radius:var(--r);margin-bottom:5px;border:1px solid var(--border)}
+.brief-sub-code{font-family:monospace;font-weight:700;color:var(--navy);font-size:11px}
+.brief-sub-by{font-size:9px;color:var(--muted);margin-left:auto;white-space:nowrap}
+.brief-spin{text-align:center;padding:30px;color:var(--muted);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.dlrow{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap}
 .fbox{margin-top:1rem;border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
 .fh{font-size:9px;font-weight:700;color:var(--muted);padding:8px 14px;background:var(--light);border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.1em}
 .fi{font-size:11px;padding:7px 14px;border-bottom:1px solid var(--border);display:flex;gap:8px;line-height:1.4;background:var(--white)}
-.fi:last-child{border-bottom:none}
-.fico{color:var(--amber);flex-shrink:0;font-weight:700}
-.dlrow{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap}
-.ebox{background:#fdf0f0;border:1px solid #e8b8b8;border-left:3px solid #c0392b;border-radius:var(--r);padding:12px 14px;font-size:12px;color:#6a1515;line-height:1.6;margin-top:8px}
+.fi:last-child{border-bottom:none}.fico{color:var(--amber);flex-shrink:0;font-weight:700}
+.ebox{background:var(--red2);border:1px solid #e8b8b8;border-left:3px solid var(--red);border-radius:var(--r);padding:12px 14px;font-size:12px;color:#6a1515;line-height:1.6;margin-top:8px}
 .hbar{background:var(--white);border:1px solid var(--border);border-radius:var(--r);margin-bottom:1rem;overflow:hidden}
 .htog{width:100%;display:flex;align-items:center;gap:8px;padding:9px 14px;background:transparent;border:none;font-family:var(--font);font-size:12px;font-weight:600;color:var(--navy);cursor:pointer;text-align:left}
-.htog:hover{background:var(--light)}
-.htog .arr{margin-left:auto;font-size:10px;color:var(--muted)}
+.htog:hover{background:var(--light)}.htog .arr{margin-left:auto;font-size:10px;color:var(--muted)}
 .hlist{display:none;border-top:1px solid var(--border)}
 .hitem{padding:8px 14px;border-bottom:1px solid var(--border);font-size:11px;display:flex;align-items:center;gap:12px;cursor:pointer}
 .hitem:last-child{border-bottom:none}.hitem:hover{background:var(--light)}
@@ -132,8 +175,29 @@ select{font-size:10px;font-family:monospace;padding:3px 7px;border-radius:4px;bo
 .lbt th{background:var(--light);padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border)}
 .lbt td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px}
 .lbt tr:last-child td{border-bottom:none}.lbt tr:hover td{background:var(--light)}
-.lbar{height:6px;background:var(--gold);border-radius:3px}
-.lbw{width:120px;background:var(--light);border-radius:3px;overflow:hidden}
+.lbar{height:6px;background:var(--gold);border-radius:3px}.lbw{width:120px;background:var(--light);border-radius:3px;overflow:hidden}
+.tm-table{width:100%;border-collapse:collapse;font-size:11px}
+.tm-table th{padding:8px 12px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--light)}
+.tm-table td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.tm-table tr:last-child td{border-bottom:none}.tm-table tr:hover td{background:#fafaf8}
+.tm-code{font-family:monospace;font-weight:700;font-size:10px;color:var(--navy);cursor:pointer}
+.tm-code:hover{text-decoration:underline;color:var(--blue)}
+.tm-subs{display:flex;flex-wrap:wrap;gap:4px}
+.tm-sub{display:inline-flex;align-items:center;gap:3px;background:var(--green2);border:1px solid #b8dfc8;color:var(--green);font-size:9px;font-family:monospace;padding:2px 7px;border-radius:3px;font-weight:700}
+.tm-sub-del{cursor:pointer;color:var(--muted);font-style:normal;padding-left:2px;font-weight:400}
+.tm-sub-del:hover{color:var(--red)}
+.tm-by{font-size:9px;color:var(--muted);font-style:italic}
+.add-mapping-form{padding:14px;border-top:2px solid var(--gold);background:#faf9f5;display:none}
+.add-mapping-form.open{display:block}
+.amf-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.amf-field label{font-size:10px;font-weight:600;color:var(--navy);display:block;margin-bottom:4px}
+.amf-field input,.amf-field select{width:100%;padding:6px 9px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:11px;outline:none;background:var(--white)}
+.amf-field input:focus,.amf-field select:focus{border-color:var(--gold)}
+.amf-zdrop{position:relative}
+.amf-zdrop .ta-drop{position:absolute;top:100%;z-index:400;margin-top:2px;left:0;right:0}
+.training-toolbar{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--light);flex-wrap:wrap}
+.training-search{padding:6px 10px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:11px;outline:none;min-width:240px;background:var(--white)}
+.training-search:focus{border-color:var(--gold)}
 .foot{height:28px;background:var(--navy);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
 .foot::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,rgba(186,178,143,.1) 0,rgba(186,178,143,.1) 1px,transparent 0,transparent 50%);background-size:6px 6px}
 .foot span{font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;position:relative}
@@ -146,8 +210,8 @@ select{font-size:10px;font-family:monospace;padding:3px 7px;border-radius:4px;bo
     <div class="auth-top"><div class="auth-title">Black<span>beard</span></div></div>
     <div class="auth-bar"></div>
     <div class="auth-body">
-      <p class="auth-sub">Enter your email to sign in</p>
-      <input class="auth-input" id="emailInput" type="email" placeholder="you@yourdomain.com" onkeydown="if(event.key==='Enter')sendMagicLink()">
+      <p class="auth-sub">Sign in to your Zanda account</p>
+      <input class="auth-input" id="emailInput" type="email" placeholder="you@zanda.com.au" onkeydown="if(event.key==='Enter')sendMagicLink()">
       <button class="auth-btn" id="magicBtn" onclick="sendMagicLink()">Send sign-in link</button>
       <div class="auth-msg" id="authMsg"></div>
       <div class="auth-or">or</div>
@@ -158,7 +222,17 @@ select{font-size:10px;font-family:monospace;padding:3px 7px;border-radius:4px;bo
     </div>
   </div>
 </div>
-
+<div class="modal-bg" id="briefModal" onclick="closeBrief(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="modal-title" id="briefTitle">Product Brief</div>
+      <button class="modal-close" onclick="closeBriefDirect()">&#x2715;</button>
+    </div>
+    <div class="modal-body" id="briefBody">
+      <div class="brief-spin"><div class="spin"></div>Looking up product&hellip;</div>
+    </div>
+  </div>
+</div>
 <div id="app">
   <div class="bar">
     <div class="bar-title">Black<span>beard</span></div>
@@ -172,16 +246,17 @@ select{font-size:10px;font-family:monospace;padding:3px 7px;border-radius:4px;bo
     <div class="ptabs">
       <button class="ptab active" onclick="showPage('schedule')">Process schedule</button>
       <button class="ptab" onclick="showPage('history')">History</button>
+      <button class="ptab" onclick="showPage('training')">Substitution library</button>
       <button class="ptab" onclick="showPage('leaderboard')">Leaderboard</button>
     </div>
     <div id="pp-schedule" class="pp active">
       <div class="hbar">
-        <button class="htog" onclick="togHist()">📋 &nbsp;Recent schedules <span class="arr" id="harr">▼</span></button>
+        <button class="htog" onclick="togHist()">&#x1F4CB; &nbsp;Recent schedules <span class="arr" id="harr">&#x25BC;</span></button>
         <div class="hlist" id="hlist"></div>
       </div>
       <div class="igrid">
         <div class="card">
-          <div class="ch"><span class="ct">Competitor schedule</span><span class="chint">Excel · CSV · PDF · paste</span></div>
+          <div class="ch"><span class="ct">Competitor schedule</span><span class="chint">Excel &middot; CSV &middot; PDF &middot; paste</span></div>
           <div class="tabs">
             <button class="tab active" onclick="swTab('file')">Upload file</button>
             <button class="tab" onclick="swTab('paste')">Paste text</button>
@@ -190,39 +265,71 @@ select{font-size:10px;font-family:monospace;padding:3px 7px;border-radius:4px;bo
             <div class="dz" id="dz" ondragover="dov(event)" ondragleave="dlv()" ondrop="ddrop(event)">
               <input type="file" id="fi" accept=".xlsx,.xls,.csv,.txt,.pdf" onchange="fsel(event)">
               <div class="dzt">Drop file here or click to browse</div>
-              <div class="dzh">Novas · Dormakaba · Entro · Lockwood · Allegion</div>
+              <div class="dzh">Novas &middot; Dormakaba &middot; Entro &middot; Lockwood &middot; Allegion</div>
             </div>
             <div class="fpill" id="fpill"></div>
             <div id="fprev"></div>
           </div>
           <div id="tp-paste" class="tp">
-            <textarea id="ptxt" placeholder="Paste schedule or BOQ…" style="min-height:118px;font-family:monospace"></textarea>
+            <textarea id="ptxt" placeholder="Paste schedule or BOQ&hellip;" style="min-height:118px;font-family:monospace"></textarea>
           </div>
         </div>
         <div class="card">
-          <div class="ch"><span class="ct">Project notes &amp; instructions</span><span class="chint">Overrides defaults</span></div>
-          <textarea class="nta" id="ntxt" placeholder="Project-specific instructions actively guide the output.
-
-Examples:
-• Use Streamline to match Novas 63 Lever. GN instead of antique bronze.
-• All fire doors — SS finish on hinges and locks.
-• Change Duke pull handles to Polo 7098.BB.BLK.
-• Basement Stair: Duke SN + 1450, free egress inside, keyed outside, fire rated closer."></textarea>
+          <div class="ch"><span class="ct">Brief Blackbeard</span><span class="chint">The more context, the better the result</span></div>
+          <textarea class="nta" id="ntxt" placeholder="Tell Blackbeard about this job.&#10;&#10;Examples:&#10;&bull; Epic Return levers throughout&#10;&bull; BN on FOH, SS on BOH and fire doors&#10;&bull; Client wants Polo pull handles on all entrances"></textarea>
           <div class="chips">
             <span class="chlbl">Quick:</span>
-            <span class="chip" onclick="addNote('Use GN finish throughout — replace all antique bronze / gunmetal.')">GN throughout</span>
-            <span class="chip" onclick="addNote('All fire doors — SS finish on hinges and locks.')">Fire doors SS</span>
-            <span class="chip" onclick="addNote('Use Streamline range for all lever sets.')">Streamline</span>
-            <span class="chip" onclick="addNote('Use Epic Return range for all lever sets.')">Epic Return</span>
-            <span class="chip" onclick="addNote('Use Duke range for all lever sets.')">Duke</span>
+            <span class="chip" onclick="addNote('GN finish throughout.')">GN throughout</span>
+            <span class="chip" onclick="addNote('All fire doors &mdash; SS finish.')">Fire doors SS</span>
+            <span class="chip" onclick="addNote('Streamline range for all levers.')">Streamline</span>
+            <span class="chip" onclick="addNote('Epic Return range for all levers.')">Epic Return</span>
+            <span class="chip" onclick="addNote('Duke range for all levers.')">Duke</span>
             <span class="chip" onclick="addNote('All seals to Raven.')">Raven seals</span>
-            <span class="chip" onclick="addNote('FOH finish: BN. BOH finish: SS.')">BN/SS split</span>
-            <span class="chip" onclick="addNote('Flag any items not supplied by Zanda.')">Flag by-others</span>
+            <span class="chip" onclick="addNote('FOH: BN finish. BOH: SS finish.')">BN/SS split</span>
+          </div>
+        </div>
+      </div>
+      <div class="preopts">
+        <div class="preopts-title">&#x2699; &nbsp;Set before processing &mdash; these become your project defaults</div>
+        <div class="preopts-grid">
+          <div class="preopts-field">
+            <label>Preferred finish</label>
+            <select id="prefFinish">
+              <option value="">Best match (from schedule)</option>
+              <option value="BN">BN &mdash; Brushed Nickel</option>
+              <option value="SS">SS &mdash; Stainless Steel</option>
+              <option value="GN">GN &mdash; Graphite Nickel</option>
+              <option value="SB">SB &mdash; Satin Brass</option>
+              <option value="BLK">BLK &mdash; Matt Black</option>
+              <option value="EB">EB &mdash; Ember Bronze</option>
+            </select>
+          </div>
+          <div class="preopts-field">
+            <label>Preferred lever range</label>
+            <select id="prefLever">
+              <option value="">Best match (Blackbeard decides)</option>
+              <option value="Epic Return">Epic Return</option>
+              <option value="Epic">Epic</option>
+              <option value="Duke Return">Duke Return</option>
+              <option value="Duke">Duke</option>
+              <option value="Streamline">Streamline</option>
+              <option value="Vertex">Vertex</option>
+              <option value="Boston">Boston</option>
+              <option value="Oxford">Oxford</option>
+            </select>
+          </div>
+          <div class="preopts-field">
+            <label>If preferred finish unavailable</label>
+            <select id="prefFallback">
+              <option value="closest">Use closest available finish</option>
+              <option value="schedule">Use finish from competitor spec</option>
+              <option value="flag">Flag for review</option>
+            </select>
           </div>
         </div>
       </div>
       <div class="arow">
-        <button class="btn btn-p" id="runBtn" onclick="run()">Process schedule</button>
+        <button class="btn btn-p" id="runBtn" onclick="run()">&#x25B6; &nbsp;Process schedule</button>
         <button class="btn" onclick="clearAll()">Clear</button>
         <div class="smsg" id="smsg"></div>
       </div>
@@ -231,19 +338,68 @@ Examples:
     <div id="pp-history" class="pp">
       <div class="card">
         <div class="ch"><span class="ct">All processed schedules</span></div>
-        <div id="histFull" style="padding:1rem;font-size:12px;color:var(--muted)">Loading…</div>
+        <div id="histFull" style="padding:1rem;font-size:12px;color:var(--muted)">Loading&hellip;</div>
+      </div>
+    </div>
+    <div id="pp-training" class="pp">
+      <div class="card">
+        <div class="ch">
+          <span class="ct">Substitution library</span>
+          <span class="chint">Every mapping speeds up future jobs &mdash; Blackbeard only needs to be told once</span>
+        </div>
+        <div style="padding:10px 14px;background:#faf9f5;border-bottom:1px solid var(--border);font-size:11px;color:var(--navy);line-height:1.6">
+          Map competitor codes to Zanda equivalents. One-to-many is fine &mdash; add all valid matches.
+          These feed directly into schedule processing.
+        </div>
+        <div class="training-toolbar">
+          <button class="btn btn-p btn-sm" onclick="toggleAddForm()">+ Add mapping</button>
+          <input class="training-search" id="tmSearch" placeholder="Search competitor code, description or Zanda code&hellip;" oninput="filterTM()">
+          <select id="tmBrand" onchange="filterTM()" style="padding:6px 9px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font);font-size:11px;outline:none;background:var(--white)">
+            <option value="">All brands</option>
+            <option value="Entro">Entro</option>
+            <option value="Dormakaba">Dormakaba</option>
+            <option value="Novas">Novas</option>
+            <option value="Lockwood">Lockwood</option>
+            <option value="Allegion">Allegion</option>
+            <option value="Other">Other</option>
+          </select>
+          <span id="tmCount" style="font-size:10px;color:var(--muted);margin-left:auto"></span>
+        </div>
+        <div id="addMappingForm" class="add-mapping-form">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold3);margin-bottom:12px">New substitution mapping</div>
+          <div class="amf-grid">
+            <div class="amf-field"><label>Competitor brand</label><select id="amBrand"><option value="Entro">Entro</option><option value="Dormakaba">Dormakaba</option><option value="Novas">Novas</option><option value="Lockwood">Lockwood</option><option value="Allegion">Allegion</option><option value="Other">Other</option></select></div>
+            <div class="amf-field"><label>Competitor code</label><input id="amCompCode" placeholder="e.g. A1001SSS" oninput="amLookupComp()"></div>
+            <div class="amf-field"><label>Competitor description</label><input id="amCompDesc" placeholder="Auto-filled if known"></div>
+          </div>
+          <div class="amf-grid">
+            <div class="amf-field amf-zdrop"><label>Zanda code</label><input id="amZandaCode" placeholder="Type to search catalogue&hellip;" oninput="amZandaSearch()" autocomplete="off"><div id="amZandaDrop" class="ta-drop" style="display:none"></div></div>
+            <div class="amf-field"><label>Zanda description</label><input id="amZandaDesc" placeholder="Auto-filled from catalogue"></div>
+            <div class="amf-field"><label>Notes (optional)</label><input id="amNotes" placeholder="e.g. close match, finish swap"></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn btn-green btn-sm" onclick="saveMapping()">&#x2713; Save mapping</button>
+            <button class="btn btn-sm" onclick="toggleAddForm()">Cancel</button>
+            <span id="amMsg" style="font-size:11px;color:var(--muted)"></span>
+          </div>
+        </div>
+        <div id="tmBody" style="overflow-x:auto">
+          <table class="tm-table">
+            <thead><tr><th style="width:90px">Brand</th><th style="width:130px">Competitor code</th><th>Description</th><th style="width:240px">Zanda equivalents</th><th style="width:140px">Confirmed by</th><th style="width:50px"></th></tr></thead>
+            <tbody id="tmRows"><tr><td colspan="6" style="padding:24px;text-align:center;color:var(--muted);font-size:11px">Loading substitution library&hellip;</td></tr></tbody>
+          </table>
+        </div>
       </div>
     </div>
     <div id="pp-leaderboard" class="pp">
       <div class="card">
-        <div class="ch"><span class="ct">Leaderboard</span><span class="chint">Most active users</span></div>
-        <div id="lbContent" style="padding:1rem;font-size:12px;color:var(--muted)">Loading…</div>
+        <div class="ch"><span class="ct">Leaderboard</span><span class="chint">Most active</span></div>
+        <div id="lbContent" style="padding:1rem;font-size:12px;color:var(--muted)">Loading&hellip;</div>
       </div>
     </div>
   </div>
-  <div class="foot"><span>Blackbeard</span></div>
+  <div class="foot"><span>Blackbeard &middot; Zanda Architectural Hardware</span></div>
 </div>
-
 <script>
 const SB_URL='https://ebgykbxxruftohpgifbe.supabase.co';
 const SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViZ3lrYnh4cnVmdG9ocGdpZmJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NjMyNTMsImV4cCI6MjA5MTMzOTI1M30.vqeglKXgYA6cVyLvKx8eQQtsp_rfGfUaoj0zLlaJUno';
@@ -252,7 +408,7 @@ const EXTRACT=EDGE+'/extract';
 const {createClient}=supabase;
 const sb=createClient(SB_URL,SB_ANON);
 let user=null,results=[],flags=[],fileText='',activeTab='file';
-
+let _catCache=null,_tmData=[];
 async function init(){
   const {data:{session}}=await sb.auth.getSession();
   if(session)showApp(session.user);
@@ -270,25 +426,23 @@ function showApp(u){
 }
 async function sendMagicLink(){
   const email=document.getElementById('emailInput').value.trim();
-  const msg=document.getElementById('authMsg');
-  const btn=document.getElementById('magicBtn');
+  const msg=document.getElementById('authMsg');const btn=document.getElementById('magicBtn');
   if(!email){msg.textContent='Enter your email first.';msg.className='auth-msg err';return;}
-  btn.disabled=true;msg.textContent='Sending…';msg.className='auth-msg';
+  btn.disabled=true;msg.textContent='Sending\u2026';msg.className='auth-msg';
   const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.href}});
   if(error){msg.textContent=error.message;msg.className='auth-msg err';btn.disabled=false;}
-  else{msg.textContent='✓ Check your email for a sign-in link.';msg.className='auth-msg ok';}
+  else{msg.textContent='\u2713 Check your email for a sign-in link.';msg.className='auth-msg ok';}
 }
-async function msLogin(){
-  const {error}=await sb.auth.signInWithOAuth({provider:'azure',options:{scopes:'email profile',redirectTo:window.location.href}});
-  if(error)alert(error.message);
-}
+async function msLogin(){const {error}=await sb.auth.signInWithOAuth({provider:'azure',options:{scopes:'email profile',redirectTo:window.location.href}});if(error)alert(error.message);}
 async function signOut(){await sb.auth.signOut();showAuth();}
 function showPage(p){
-  document.querySelectorAll('.ptab').forEach((b,i)=>b.classList.toggle('active',['schedule','history','leaderboard'][i]===p));
+  const pages=['schedule','history','training','leaderboard'];
+  document.querySelectorAll('.ptab').forEach((b,i)=>b.classList.toggle('active',pages[i]===p));
   document.querySelectorAll('.pp').forEach(el=>el.classList.remove('active'));
   document.getElementById('pp-'+p).classList.add('active');
   if(p==='history')loadHistFull();
   if(p==='leaderboard')loadLB();
+  if(p==='training')loadTraining();
 }
 function swTab(t){
   activeTab=t;
@@ -304,10 +458,9 @@ function fsel(e){const f=e.target.files[0];if(f)loadFile(f);}
 function loadFile(file){
   const ext=file.name.split('.').pop().toLowerCase();
   const sz=file.size<1048576?Math.round(file.size/1024)+' KB':(file.size/1048576).toFixed(1)+' MB';
-  const icon=ext==='pdf'?'📄':(ext==='xlsx'||ext==='xls')?'📊':'📋';
-  const p=document.getElementById('fpill');
-  p.style.display='flex';
-  p.innerHTML=`<span>${icon}</span><span class="fn">${file.name}</span><span class="fs">${sz}</span><button class="frm" onclick="rmFile()">✕</button>`;
+  const icon=ext==='pdf'?'\uD83D\uDCC4':(ext==='xlsx'||ext==='xls')?'\uD83D\uDCCA':'\uD83D\uDCCB';
+  const p=document.getElementById('fpill');p.style.display='flex';
+  p.innerHTML='<span>'+icon+'</span><span class="fn">'+file.name+'</span><span class="fs">'+sz+'</span><button class="frm" onclick="rmFile()">\u2715</button>';
   document.getElementById('dz').style.display='none';
   if(ext==='xlsx'||ext==='xls')readXL(file);
   else if(ext==='pdf')readPDF(file);
@@ -316,54 +469,57 @@ function loadFile(file){
 function readTxt(f){const r=new FileReader();r.onload=e=>{fileText=e.target.result;showPrev(fileText);};r.readAsText(f);}
 function readXL(f){
   const r=new FileReader();
-  r.onload=e=>{
-    try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});let t='';wb.SheetNames.forEach(n=>{t+=XLSX.utils.sheet_to_csv(wb.Sheets[n])+'\n';});fileText=t;showPrev(t);}
-    catch(err){setSt('Excel error: '+err.message,false);}
-  };r.readAsArrayBuffer(f);
+  r.onload=e=>{try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});let t='';wb.SheetNames.forEach(n=>{t+=XLSX.utils.sheet_to_csv(wb.Sheets[n])+'\n';});fileText=t;showPrev(t);}catch(err){setSt('Excel error: '+err.message,false);}};
+  r.readAsArrayBuffer(f);
 }
 async function readPDF(file){
-  setSt('Extracting PDF…',true);
+  setSt('Extracting PDF\u2026',true);
   try{
-    const {data:{session}}=await sb.auth.getSession();
-    if(!session)throw new Error('Not authenticated');
-    const fd=new FormData();
-    fd.append('files',file,file.name);
-    const resp=await fetch(EXTRACT,{method:'POST',headers:{'apikey':SB_ANON,'authorization':`Bearer ${session.access_token}`},body:fd});
-    if(!resp.ok){const e=await resp.json().catch(()=>({error:resp.statusText}));throw new Error(e.error||`HTTP ${resp.status}`);}
-    const data=await resp.json();
-    const result=data.files?.[0];
-    if(!result)throw new Error('No result from extraction service');
-    if(result.error)throw new Error(result.error);
-    if(!result.text||result.text.length<20)throw new Error('PDF appears to be scanned/image-only — try pasting the text instead');
-    fileText=result.text;
-    showPrev(fileText);
-    setSt(`✓ ${(fileText.length/1000).toFixed(0)}k chars extracted`,false);
+    const {data:{session}}=await sb.auth.getSession();if(!session)throw new Error('Not authenticated');
+    const fd=new FormData();fd.append('files',file,file.name);
+    const resp=await fetch(EXTRACT,{method:'POST',headers:{apikey:SB_ANON,authorization:'Bearer '+session.access_token},body:fd});
+    if(!resp.ok){const e=await resp.json().catch(()=>({error:resp.statusText}));throw new Error(e.error||'HTTP '+resp.status);}
+    const data=await resp.json();const result=data.files?.[0];
+    if(!result)throw new Error('No result');if(result.error)throw new Error(result.error);
+    if(!result.text||result.text.length<20)throw new Error('PDF appears scanned \u2014 try pasting text instead');
+    fileText=result.text;showPrev(fileText);setSt('\u2713 '+(fileText.length/1000).toFixed(0)+'k chars extracted',false);
   }catch(err){setSt('PDF error: '+err.message,false);fileText='';}
 }
-function showPrev(t){const lines=t.split('\n').slice(0,5).join('\n');document.getElementById('fprev').innerHTML=`<div class="fprev">${esc(lines)}${t.split('\n').length>5?'\n…':''}</div>`;}
+function showPrev(t){const lines=t.split('\n').slice(0,5).join('\n');document.getElementById('fprev').innerHTML='<div class="fprev">'+esc(lines)+(t.split('\n').length>5?'\n\u2026':'')+'</div>';}
 function rmFile(){fileText='';document.getElementById('fpill').style.display='none';document.getElementById('fprev').innerHTML='';document.getElementById('dz').style.display='';document.getElementById('fi').value='';setSt('',false);}
-function setSt(msg,spin){document.getElementById('smsg').innerHTML=spin?`<div class="spin"></div>${msg}`:msg;}
+function setSt(msg,spin){document.getElementById('smsg').innerHTML=spin?'<div class="spin"></div>'+msg:msg;}
 function clearAll(){rmFile();document.getElementById('ptxt').value='';document.getElementById('ntxt').value='';document.getElementById('results').innerHTML='';results=[];flags=[];setSt('',false);}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-async function ai(system,content,max=1500){
-  const {data:{session}}=await sb.auth.getSession();
-  if(!session)throw new Error('Not authenticated');
-  const messages=[{role:'user',content:Array.isArray(content)?content:[{type:'text',text:content}]}];
-  const r=await fetch(EDGE,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({system,messages,max_tokens:max})});
-  if(!r.ok){const e=await r.json().catch(()=>({error:r.statusText}));throw new Error(e.error||`HTTP ${r.status}`);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+async function ai(system,content,max){
+  max=max||1500;
+  const {data:{session}}=await sb.auth.getSession();if(!session)throw new Error('Not authenticated');
+  const r=await fetch(EDGE,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},body:JSON.stringify({system,messages:[{role:'user',content:[{type:'text',text:content}]}],max_tokens:max})});
+  if(!r.ok){const e=await r.json().catch(()=>({error:r.statusText}));throw new Error(e.error||'HTTP '+r.status);}
   const d=await r.json();if(d.error)throw new Error(d.error);return d.text;
 }
+async function getCatCodes(){
+  if(_catCache)return _catCache;
+  const {data}=await sb.from('zanda_catalogue').select('code,description,category');
+  _catCache={};(data||[]).forEach(r=>{_catCache[r.code]={desc:r.description,cat:r.category};});
+  return _catCache;
+}
+function uname(){return user?.user_metadata?.full_name||user?.email||'Unknown';}
 async function lookupSubs(codes){
   const norms=codes.map(c=>c.toUpperCase().replace(/[\s\/\-\*\.]/g,''));
-  const {data}=await sb.from('substitutions').select('competitor_code_norm,competitor_description,zanda_code,zanda_description,zanda_category,finish_mapping_note,is_by_others,source').in('competitor_code_norm',norms);
-  const map={};(data||[]).forEach(r=>{map[r.competitor_code_norm]=r;});return map;
+  const [a,b]=await Promise.all([
+    sb.from('substitutions').select('competitor_code_norm,competitor_description,zanda_code,zanda_description,zanda_category,finish_mapping_note,is_by_others,source,confidence,confirmed_by_name').in('competitor_code_norm',norms),
+    sb.from('training_mappings').select('competitor_code,zanda_code,zanda_description,confirmed_by_name,confidence').in('competitor_code',codes)
+  ]);
+  const map={};
+  (a.data||[]).forEach(r=>{map[r.competitor_code_norm]=r;});
+  (b.data||[]).forEach(r=>{const n=r.competitor_code.toUpperCase().replace(/[\s\/\-\*\.]/g,'');if(!map[n]||r.confidence==='training_confirmed'){map[n]={...map[n],...r,competitor_code_norm:n};}});
+  return map;
 }
 async function storeSub(row){
-  await sb.from('substitutions').upsert({competitor_code:row.compCode,competitor_code_norm:row.compCode.toUpperCase().replace(/[\s\/\-\*\.]/g,''),competitor_description:row.compDesc,zanda_code:row.zandaCode,zanda_description:row.zandaDesc,source:'user_confirmed',confirmed_by:user?.id,confirmed_at:new Date().toISOString()},{onConflict:'competitor_code_norm'});
+  await sb.from('substitutions').upsert({competitor_code:row.compCode,competitor_code_norm:row.compCode.toUpperCase().replace(/[\s\/\-\*\.]/g,''),competitor_description:row.compDesc,zanda_code:row.zandaCode,zanda_description:row.zandaDesc,source:'user_confirmed',confidence:'user_confirmed',confirmed_by:user?.id,confirmed_by_name:uname(),confirmed_by_email:user?.email,confirmed_at:new Date().toISOString()},{onConflict:'competitor_code_norm'});
 }
-async function saveProject(name,brand,count,notes){
-  const {data,error}=await sb.from('projects').insert({project_name:name,competitor_brand:brand,file_name:'upload',line_count:count,status:'complete',uploaded_by:user?.id,notes:notes||null}).select().single();
+async function saveProject(name,brand,count,notes,pf,pl){
+  const {data,error}=await sb.from('projects').insert({project_name:name,competitor_brand:brand,file_name:'upload',line_count:count,status:'complete',uploaded_by:user?.id,notes:notes||null,preferred_finish:pf||null,preferred_lever:pl||null}).select().single();
   if(error){console.warn(error);return null;}return data.id;
 }
 async function saveLines(pid,lines){
@@ -374,57 +530,30 @@ async function logUse(action,count,brand){
   if(!user)return;
   await sb.from('usage_log').insert({user_id:user.id,user_email:user.email,user_name:user.user_metadata?.full_name||user.email,action,line_count:count||null,competitor_brand:brand||null});
 }
-async function loadHist(){
-  const {data}=await sb.from('projects').select('id,project_name,competitor_brand,line_count,uploaded_at').order('uploaded_at',{ascending:false}).limit(10);
-  const list=document.getElementById('hlist');
-  if(!data||!data.length){list.innerHTML='<div style="padding:10px 14px;font-size:11px;color:var(--muted)">No past schedules yet.</div>';return;}
-  list.innerHTML=data.map(p=>`<div class="hitem" onclick="loadProject('${p.id}')"><span class="hdate">${new Date(p.uploaded_at).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}</span><span class="hname">${esc(p.project_name||'Untitled')}</span><span class="hmeta">${p.competitor_brand||''} · ${p.line_count||0} lines</span></div>`).join('');
-}
-async function loadHistFull(){
-  const {data}=await sb.from('projects').select('id,project_name,competitor_brand,line_count,uploaded_at').order('uploaded_at',{ascending:false}).limit(50);
-  const el=document.getElementById('histFull');
-  if(!data||!data.length){el.innerHTML='<p>No schedules yet.</p>';return;}
-  el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:var(--light)">${['Date','Project','Brand','Lines',''].map(h=>`<th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)">${h}</th>`).join('')}</tr></thead><tbody>${data.map(p=>`<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-size:11px;color:var(--muted)">${new Date(p.uploaded_at).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'2-digit'})}</td><td style="padding:8px 12px;font-weight:600">${esc(p.project_name||'Untitled')}</td><td style="padding:8px 12px;font-size:11px;color:var(--muted)">${p.competitor_brand||'—'}</td><td style="padding:8px 12px;font-weight:600">${p.line_count||0}</td><td style="padding:8px 12px"><button class="btn" style="padding:4px 10px;font-size:10px" onclick="loadProject('${p.id}');showPage('schedule')">Load</button></td></tr>`).join('')}</tbody></table>`;
-}
-async function loadLB(){
-  const {data}=await sb.from('usage_log').select('user_name,user_email,action').eq('action','process_schedule');
-  const el=document.getElementById('lbContent');
-  if(!data||!data.length){el.innerHTML='<p>No activity yet. Process a schedule to appear here.</p>';return;}
-  const counts={};data.forEach(r=>{const n=r.user_name||r.user_email||'Unknown';counts[n]=(counts[n]||0)+1;});
-  const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  const max=sorted[0]?.[1]||1;
-  const medals=['🥇','🥈','🥉'];
-  el.innerHTML=`<table class="lbt"><thead><tr><th>#</th><th>User</th><th>Schedules</th><th></th></tr></thead><tbody>${sorted.map(([name,count],i)=>`<tr><td style="font-weight:700;width:30px">${i<3?medals[i]:(i+1)}</td><td style="font-weight:600">${esc(name)}</td><td style="font-weight:700;color:var(--gold3)">${count}</td><td><div class="lbw"><div class="lbar" style="width:${Math.round(count/max*100)}%"></div></div></td></tr>`).join('')}</tbody></table>`;
-}
-async function loadProject(id){
-  const {data}=await sb.from('project_lines').select('*').eq('project_id',id);
-  if(!data)return;
-  results=data.map(r=>({compCode:r.competitor_code,compDesc:r.competitor_description||'',qty:r.qty,door:r.door_ref||'',zandaCode:r.zanda_code||'',zandaDesc:r.zanda_description||'',matchType:r.match_type||'suggested',notes:r.notes||'',nm:r.notes_driven||false}));
-  togHist();render(results,'');
-}
-function togHist(){const l=document.getElementById('hlist');const a=document.getElementById('harr');const o=l.style.display==='block';l.style.display=o?'none':'block';a.textContent=o?'▼':'▲';}
-
 async function run(){
   let input='';
-  if(activeTab==='file'){if(!fileText){setSt('No file loaded — or PDF extraction failed.',false);return;}input=fileText;}
+  if(activeTab==='file'){if(!fileText){setSt('No file loaded.',false);return;}input=fileText;}
   else{input=document.getElementById('ptxt').value.trim();if(!input){setSt('Paste a schedule first.',false);return;}}
   const notes=document.getElementById('ntxt').value.trim();
+  const prefFinish=document.getElementById('prefFinish').value;
+  const prefLever=document.getElementById('prefLever').value;
+  const prefFallback=document.getElementById('prefFallback').value;
   const btn=document.getElementById('runBtn');
-  btn.disabled=true;setSt('Parsing schedule…',true);
+  btn.disabled=true;setSt('Parsing schedule\u2026',true);
   try{
     const parsed=await parse(input,notes);
-    if(!parsed.length){setSt('No items found — check format.',false);btn.disabled=false;return;}
-    setSt(`Matching ${parsed.length} items…`,true);
-    const res=await matchAll(parsed,notes);
+    if(!parsed.length){setSt('No items found \u2014 check format.',false);btn.disabled=false;return;}
+    setSt('Matching '+parsed.length+' items\u2026',true);
+    const res=await matchAll(parsed,notes,prefFinish,prefLever,prefFallback);
     results=res;setSt('',false);btn.disabled=false;
     const brand=detBrand(parsed);
     logUse('process_schedule',res.length,brand);
-    const pid=await saveProject(input.trim().slice(0,60)||'Schedule',brand,res.length,notes);
+    const pid=await saveProject(input.trim().slice(0,60)||'Schedule',brand,res.length,notes,prefFinish,prefLever);
     if(pid){await saveLines(pid,res);loadHist();}
-    render(res,notes);
+    render(res,notes,prefFinish,prefLever);
   }catch(e){
     setSt('',false);btn.disabled=false;
-    document.getElementById('results').innerHTML=`<div class="ebox"><strong>Error: ${esc(e.message)}</strong><br><br>Ensure the Anthropic API key is set in Supabase Edge Function secrets.</div>`;
+    document.getElementById('results').innerHTML='<div class="ebox"><strong>Error: '+esc(e.message)+'</strong><br><br>Check that the Anthropic API key is set in Supabase Edge Function secrets.</div>';
   }
 }
 function detBrand(items){
@@ -437,101 +566,310 @@ function detBrand(items){
 }
 async function parse(text,notes){
   const trunc=text.length>12000?text.slice(0,12000)+'\n[truncated]':text;
-  const raw=await ai('You are a door hardware schedule parser. Return only valid JSON arrays.',`Parse this schedule. Extract every unique product. Tally quantities if door-by-door. Return ONLY:\n[{"code":"CODE","description":"DESC","qty":NUMBER,"door":"DOOR_OR_EMPTY"}]\nCombine identical codes, default qty=1, ignore headers.${notes?'\nNotes:\n'+notes:''}\n\nSchedule:\n${trunc}`,2000);
+  const raw=await ai('You are a door hardware schedule parser. Return only valid JSON arrays.','Parse this schedule. Extract every unique product. Tally quantities if door-by-door. Return ONLY:\n[{"code":"CODE","description":"DESC","qty":NUMBER,"door":"DOOR_OR_EMPTY"}]\nCombine identical codes, default qty=1, ignore headers.'+(notes?'\nNotes:\n'+notes:'')+'\n\nSchedule:\n'+trunc,2000);
   try{return JSON.parse(raw.replace(/```json|```/g,'').trim());}catch(e){return[];}
 }
-async function matchAll(items,notes){
+async function matchAll(items,notes,prefFinish,prefLever,prefFallback){
   results=[];flags=[];
   const dbMap=await lookupSubs(items.map(i=>i.code));
   const unknowns=[],uidxs=[];
   items.forEach((item,i)=>{
     const key=item.code.toUpperCase().replace(/[\s\/\-\*\.]/g,'');
     const db=dbMap[key];
-    if(db&&!notes){results.push({compCode:item.code,compDesc:item.description||db.competitor_description||'',qty:item.qty,door:item.door||'',zandaCode:db.zanda_code,zandaDesc:db.zanda_description||'',matchType:'confirmed',notes:db.finish_mapping_note||'',nm:false,cat:db.zanda_category||'ALL'});}
-    else{results.push(null);unknowns.push(item);uidxs.push(i);}
+    if(db&&!notes&&!prefFinish&&!prefLever){
+      results.push({compCode:item.code,compDesc:item.description||db.competitor_description||'',qty:item.qty,door:item.door||'',zandaCode:db.zanda_code,zandaDesc:db.zanda_description||'',matchType:'confirmed',notes:db.finish_mapping_note||'',nm:false,cat:db.zanda_category||'ALL',confirmedBy:db.confirmed_by_name||'',staked:false});
+    }else{results.push(null);unknowns.push(item);uidxs.push(i);}
   });
   if(unknowns.length){
     const cs=12;
     for(let ci=0;ci<Math.ceil(unknowns.length/cs);ci++){
       const chunk=unknowns.slice(ci*cs,(ci+1)*cs);
-      setSt(`AI lookup ${ci+1}/${Math.ceil(unknowns.length/cs)}…`,true);
-      const air=await aiLookup(chunk,notes);
+      setSt('AI lookup '+(ci+1)+'/'+Math.ceil(unknowns.length/cs)+'\u2026',true);
+      const air=await aiLookup(chunk,notes,prefFinish,prefLever,prefFallback);
       air.forEach((a,j)=>{if(a.matchType==='by_others')flags.push({code:chunk[j].code,reason:a.notes||'Not supplied by Zanda'});});
       uidxs.slice(ci*cs,(ci+1)*cs).forEach((origIdx,j)=>{results[origIdx]=air[j];});
     }
   }
   return results;
 }
-async function aiLookup(items,notes){
-  const kb=`ZANDA SUBSTITUTION RULES:
-FINISHES: BN=Brushed Nickel (default FOH; replaces SC/SN/SNP/silver-SABZ), GN=Graphite Nickel (replaces GM/Gunmetal), SS=Stainless Steel (default BOH/fire), BLK=Matt Black, SB=Satin Brass, EB=Ember Bronze. SC->BN.
-RAVEN: ALL seals -> always Raven: A8SIC32(820mm),A8SIC36(920mm),A8SIC42(1070mm),A120S,A120LS,A120DS,A120LDS.
-KEY SUBS: Lockwood 3772->1450.SS. 3774->1131.SS. Nightlatches->10432.SS. Oval cyl->1160+finish. Entro A0100SSSM->1450.SS. Entro B3110SSS->9613.SS. Entro B3610SSS->9610.SS. Entro B0110SSS->10001.BN. Entro D0653SIL->TS.9205.FB.SE. Entro D0652SIL->TS.8016.SA.SE. Entro D1203SIL-B->TS.8015.CAB.SIL. Entro D0753SIL->TS.8016.FB.SE. Entro J0301SSS->5904.SS. Entro J0520SSS->5908.SS. Entro G3200SSS->10430.SS. Entro G0104SSS->10405.SS. Entro G0106SSS->10407.SS. Entro G0115SSS->10406.SS. Entro G4001SSS->11530.SS. Entro K0101SSS->14008.BN. Entro K0401SSS->5266.SC. Entro B0004SSS->7027. Entro B0005SSS->7023. Entro A5000MKA1->1160. Entro A5000XKA1->1160. Entro A5000ZKA1->1160. Entro A1001SSS->10416.SS. Entro F8006SCA->A8SIC36(Raven). Entro F7019SCA->Raven meeting stile seal. Entro KP720X150SSS->11600.720.SS. Entro KP870X150SSS->11600.870.SS. Entro KP920X150SSS->11600.920.SS. Entro KP920X320SSS->11600.920X320.SS. Entro C1106SSS->7122.BB.SS.
-CLOSERS: TS.9205.FB.SE(std fb),TS.9205.SA.SE(std sa),TS.8016.FB.SE(heavy fb),TS.8016.SA.SE(heavy sa),TS.8015.CAB.SIL(cam pull DDA),TS.8024.FB(economy).
-RANGES: Epic Return(10001-10004),Epic(10021-10026),Duke Return(10051-10054),Duke(10091-10096),Streamline(7314/7315.PR/7316).
-BY OTHERS: panic exit devices,aluminium hinges,access control electronics,glass hardware,gate hardware,card readers,electric strikes (unless ESV.100/ESV.200),PTD,reed sensors,frame seals by door mfr,master keyed cylinders by locksmith.
-${notes?'PROJECT NOTES (override ALL defaults):\n'+notes:''}`;
-  const list=items.map((it,i)=>`${i+1}. Code:"${it.code}" Desc:"${it.description||''}" Door:"${it.door||''}"`).join('\n');
-  const raw=await ai(kb,`For each item return a JSON array:\n[{"zandaCode":"","zandaDesc":"","matchType":"confirmed|suggested|by_others|unresolved","notes":"","nm":false,"cat":""}]\nnm=true if notes changed default. Return ONLY JSON.\n\n${list}`,2000);
+async function aiLookup(items,notes,prefFinish,prefLever,prefFallback){
+  const catCodes=await getCatCodes().catch(()=>({}));
+  const finishRule=prefFinish
+    ?'PREFERRED FINISH: '+prefFinish+'. Use '+prefFinish+' wherever that finish exists in the Zanda catalogue for the relevant product. If the product is not available in '+prefFinish+', '+(prefFallback==='flag'?'set matchType to unresolved and note the finish gap in finishNote':prefFallback==='schedule'?'use the finish code from the competitor specification':'use the closest available finish and explain briefly in finishNote')+'. Never assume a finish is correct for an application type \u2014 availability drives the decision.'
+    :'FINISH: Match the competitor spec finish as closely as possible. Default to BN where no guidance is given. ALWAYS include the full finish suffix in every code (e.g. 1450.BN not just 1450).';
+  const leverRule=prefLever?'PREFERRED LEVER RANGE: '+prefLever+'. Where a lever set is required, use the '+prefLever+' range.':'LEVER RANGE: Choose the most appropriate Zanda lever range based on context and product equivalence.';
+  const kb='You are Blackbeard, a door hardware substitution specialist for Zanda Architectural Hardware (Australia).\n\n'+finishRule+'\n'+leverRule+'\n\nRAVEN SEALS \u2014 ABSOLUTE RULE: ALL door seals and perimeter seals must be Raven products:\n- Door bottom seals: A8SIC32 (820mm), A8SIC36 (920mm), A8SIC42 (1070mm)\n- Perimeter seals: A120S, A120LS, A120DS, A120LDS\nNo other seal brands. No exceptions.\n\nKNOWN SUBSTITUTIONS (apply these directly):\nEntro A0100SSSM\u21921450.SS, B3110SSS\u21929613.SS, B3610SSS\u21929610.SS, B0110SSS\u219210001.BN,\nD0653SIL\u2192TS.9205.FB.SE, D0652SIL\u2192TS.8016.SA.SE, D1203SIL-B\u2192TS.8015.CAB.SIL, D0753SIL\u2192TS.8016.FB.SE,\nJ0301SSS\u21925904.SS, J0520SSS\u21925908.SS, G3200SSS\u219210430.SS, G0104SSS\u219210405.SS, G0106SSS\u219210407.SS,\nG0115SSS\u219210406.SS, G4001SSS\u219211530.SS, K0101SSS\u219214008.BN, K0401SSS\u21925266.SC,\nB0004SSS\u21927027.BN, B0005SSS\u21927023.BN, A5000MKA1/XKA1/ZKA1\u21921160.BN,\nA1001SSS\u21921131.SS (tubular latch 60mm backset), F8006SCA\u2192A8SIC36, C1106SSS\u21927122.BB.SS.\nLockwood 3772\u21921450.SS, 3774\u21921131.SS.\n\nDOOR CLOSERS: TS.9205.FB.SE (standard flat bar), TS.9205.SA.SE (standard slide arm),\nTS.8016.FB.SE (heavy duty flat bar), TS.8016.SA.SE (heavy duty slide arm),\nTS.8015.CAB.SIL (cam action DDA pull side), TS.8024.FB (economy).\n\nBY OTHERS \u2014 do NOT provide a Zanda code for these:\nPanic/emergency exit devices, aluminium hinges, access control electronics, glass hardware,\ngate hardware, card readers, electric strikes (unless ESV.100 or ESV.200), PTD sensors,\nreed sensors, frame seals fitted by door manufacturer, master-keyed cylinders by locksmith.\n\nCRITICAL CODE RULE: Always include the full finish suffix. Never suggest a bare code like "1160" \u2014 always "1160.BN" or "1160.SS" etc.\n'+(notes?'\nPROJECT BRIEF \u2014 these instructions override everything above:\n'+notes:'');
+  let catRef='';
+  if(Object.keys(catCodes).length>0){
+    const keyCats=['LOCKS & LATCHES','DOOR FURNITURE','HINGES','DOOR CONTROLS','ACCESSORIES','PULL HANDLES','SLIDING HARDWARE'];
+    const bycat={};
+    Object.entries(catCodes).forEach(([code,v])=>{if(keyCats.includes(v.cat)){if(!bycat[v.cat])bycat[v.cat]=[];bycat[v.cat].push(code);}});
+    catRef='\n\nVALID ZANDA CODES \u2014 you must only use codes from this list:\n'+Object.entries(bycat).map(([cat,codes])=>cat+': '+codes.join(', ')).join('\n');
+    if(catRef.length>8000)catRef=catRef.slice(0,8000)+'...';
+  }
+  const list=items.map((it,i)=>(i+1)+'. Code:"'+it.code+'" Desc:"'+(it.description||'')+'" Door:"'+(it.door||'')+'"').join('\n');
+  const raw=await ai(kb+catRef,'Return a JSON array with one object per item:\n[{"zandaCode":"FULL_CODE_WITH_FINISH","zandaDesc":"","matchType":"confirmed|suggested|by_others|unresolved","notes":"","nm":false,"cat":"","finishNote":""}]\nnm=true only if the project brief changed the default. finishNote: if you fell back from preferred finish, briefly explain. Return ONLY valid JSON.\n\n'+list,2500);
   let air;
   try{air=JSON.parse(raw.replace(/```json|```/g,'').trim());}
-  catch(e){air=items.map(()=>({zandaCode:'UNRESOLVED',zandaDesc:'',matchType:'unresolved',notes:'parse error',nm:false,cat:'ALL'}));}
-  return items.map((item,i)=>{const a=air[i]||{zandaCode:'UNRESOLVED',zandaDesc:'',matchType:'unresolved',notes:'',nm:false,cat:'ALL'};return{compCode:item.code,compDesc:item.description||'',qty:item.qty,door:item.door||'',zandaCode:a.zandaCode||'UNRESOLVED',zandaDesc:a.zandaDesc||'',matchType:a.matchType||'unresolved',notes:a.notes||'',nm:!!a.nm,cat:a.cat||'ALL'};});
-}
-
-const ZC={'DOOR FURNITURE':['10001.BN','10001.GN','10001.BLK','10001.SS','10002.BN','10002.GN','10003.D.BN','10004.3.BN','10004.4.BN','10021.BN','10021.GN','10021.BLK','10022.SS','10023.D.BN','10024.3.BN','10024.4.BN','10026.BN','10026.GN','10051.BN','10051.GN','10052.BN','10054.3.BN','10054.4.BN','10091.BN','10092.BN','10093.D.BN','10094.3.BN','10094.4.BN','7314.BN','7314.GN','7315.PR.BN','7316.3.BN','7316.4.BN','7325.BN','7325.GN','7326.BN','7344.BN','7345.BN','7354.BN','7355.BN','7355.BLK','11019','11020','11020.SC','11021','9613.SS','9610.SS','9660.SS','9662.SS'],'LOCKS & LATCHES':['1450.SS','1450.GN','1450.BLK','1450.EB','1131.SS','1131.BN','1160','1160.BN','1160.SS','1160.GN','10432.SS','10416.SS','10416.BN','7020.O','7020.O.BN','7023','7024','7027'],'HINGES':['5927.SS','5910.SS','5904.SS','5903.SS','5901.SS','5901.SB','5901.GN','5908.SS','5929.SS','5939.SS'],'DOOR CONTROLS':['TS.9205.SRFB.SNP','TS.9205.SRFB.GN','TS.9205.SRSA.SNP','TS.9205.SRSA.GN','TS.9205.FB.SE','TS.9205.SA.SE','TS.8016.FB.SE','TS.8016.SA.SE','TS.8015.CAB.SIL','TS.8024.FB','TS.7004','TS.7306'],'ACCESSORIES':['5256.BN','5256.SS','5256.GN','5256.BLK','14008.BN','14008.GN','14009.BN','5244.BN','5266.SC','10500.BN','10421.SS','10427.SS','10430.SS','10430.BLK','7188.GN','5243','ESV.100','ESV.200','A8SIC32','A8SIC36','A8SIC42','A120S','A120LS','A120DS','A120LDS','10405.SS','10406.SS','10407.SS','11530.SS'],'PULL HANDLES':['7130','7130.BN','7130.SS','13505','7026','7100','7098.BB.BLK','7099.BB','7122.BB.SS'],'SLIDING':['5327']};
-const ZD={'10001.BN':'Epic Return Passage BN','10001.GN':'Epic Return Passage GN','10001.BLK':'Epic Return Passage BLK','10001.SS':'Epic Return Passage SS','10002.BN':'Epic Return Privacy BN','10003.D.BN':'Epic Return Dummy BN','10004.3.BN':'Epic Return Entrance KK BN','10004.4.BN':'Epic Return Entrance KT BN','10021.BN':'Epic Passage BN','10021.GN':'Epic Passage GN','10021.BLK':'Epic Passage BLK','10022.SS':'Epic Privacy SS','10023.D.BN':'Epic Dummy BN','10024.3.BN':'Epic Entrance KK BN','10024.4.BN':'Epic Entrance KT BN','10026.BN':'Epic Sep Privacy BN','10051.BN':'Duke Return Passage BN','10051.GN':'Duke Return Passage GN','10052.BN':'Duke Return Privacy BN','10054.3.BN':'Duke Return Entrance KK BN','10054.4.BN':'Duke Return Entrance KT BN','10091.BN':'Duke Passage BN','10092.BN':'Duke Privacy BN','10093.D.BN':'Duke Dummy BN','10094.3.BN':'Duke Entrance KK BN','10094.4.BN':'Duke Entrance KT BN','7314.BN':'Streamline Passage BN','7314.GN':'Streamline Passage GN','7315.PR.BN':'Streamline Privacy BN','7316.3.BN':'Streamline Entrance KK BN','7316.4.BN':'Streamline Entrance KT BN','7325.BN':'Streamline Apt Entrance BN','7325.GN':'Streamline Apt Entrance GN','7326.BN':'Streamline Apt Privacy BN','7344.BN':'Duke Return Vestibule BN','7345.BN':'Duke Return Apt Entrance BN','7354.BN':'Epic Return Vestibule BN','7355.BN':'Epic Return Apt Entrance BN','7355.BLK':'Epic Return Apt Entrance BLK','11020':'Phoenix Entrance DDA BLK','11020.SC':'Phoenix Entrance DDA SC','11019':'Phoenix Passage SC','11021':'Phoenix Privacy SC','9613.SS':'Bastion External Plate SS','9610.SS':'Bastion Internal Plate SS','9660.SS':'J13 Double Cyl Kit SS','9662.SS':'J13 Cyl Turn Kit SS','1450.SS':'Commercial Mortice Lock FR SS','1450.GN':'Commercial Mortice Lock FR GN','1450.BLK':'Commercial Mortice Lock FR BLK','1450.EB':'Commercial Mortice Lock FR EB','1131.SS':'Tubular Latch 60mm SS','1131.BN':'Tubular Latch 60mm BN','1160':'Oval Cylinder 6 pin','1160.BN':'Oval Cylinder BN','1160.SS':'Oval Cylinder SS','1160.GN':'Oval Cylinder GN','10432.SS':'Night Latch 60mm SS','10416.SS':'Tubular Bolt 60mm SS','10416.BN':'Tubular Bolt 60mm BN','7020.O':'Oval Escutcheon','7020.O.BN':'Round Oval Escutcheon BN','7023':'Escutcheon Disabled Turn','7024':'Escutcheon with Turn','7027':'Emergency Release','5927.SS':'Bearing Hinge 100x100 SS','5910.SS':'Butt Hinge 100x100 SS','5904.SS':'Bearing Hinge 100x75 SS','5903.SS':'Butt Hinge 100x75 SS','5901.SS':'Butt Hinge Loose Pin SS','5901.SB':'Butt Hinge Loose Pin SB','5901.GN':'Butt Hinge Loose Pin GN','5908.SS':'Fast Fix Hinge 100x70 SS','5929.SS':'Lift Off Hinge LH SS','5939.SS':'Lift Off Hinge RH SS','TS.9205.SRFB.SNP':'TS9205 Combined Flat Bar BN','TS.9205.SRFB.GN':'TS9205 Combined Flat Bar GN','TS.9205.SRSA.SNP':'TS9205 Combined Slide Arm BN','TS.9205.SRSA.GN':'TS9205 Combined Slide Arm GN','TS.9205.FB.SE':'TS9205 Standard Flat Bar','TS.9205.SA.SE':'TS9205 Standard Slide Arm','TS.8016.FB.SE':'TS8016 Heavy Flat Bar EN1-6','TS.8016.SA.SE':'TS8016 Heavy Slide Arm EN1-6','TS.8015.CAB.SIL':'TS8015 Cam Action Pull DDA','TS.8024.FB':'Economy Closer EN2-4','TS.7004':'Floor Spring EN4 150kg','TS.7306':'Ultra HD Floor Spring 300kg','5256.BN':'Round Floor Stop BN','5256.SS':'Round Floor Stop SS','5256.GN':'Round Floor Stop GN','5256.BLK':'Round Floor Stop BLK','14008.BN':'Half Moon Floor Stop BN','14008.GN':'Half Moon Floor Stop GN','14009.BN':'Triangular Floor Stop BN','5244.BN':'Round Wall Stop 19mm BN','5266.SC':'Skirting Wall Stop 35mm SC','10500.BN':'Magnetic Door Stop BN','10421.SS':'DDA Privacy Turn Release SS','10427.SS':'Auto Flush Bolt SS','10430.SS':'Push Pull Plates SS','10430.BLK':'Push Pull Plates BLK','7188.GN':'Duke Push Pull Plate GN','5243':'Door Viewer 180°','ESV.100':'Electric Strike 680kg','ESV.200':'Electric Strike Non-Monitored','A8SIC32':'Raven Door Bottom 820mm','A8SIC36':'Raven Door Bottom 920mm','A8SIC42':'Raven Door Bottom 1070mm','A120S':'Raven Single Perim Set','A120LS':'Raven Long Single Perim Set','A120DS':'Raven Double Perim Set','A120LDS':'Raven Long Double Perim Set','7130':'Nitro Pull Handle 600mm','7130.BN':'Nitro Pull Handle BN','7130.SS':'Nitro Pull Handle SS','13505':'Toorak Pull Handle','7026':'Round Profile Pull Handle','7100':'Polo Pull Handle 560mm','7098.BB.BLK':'Polo Pull Handle 450mm B2B BLK','7099.BB':'Polo Pull Handle 450mm B2B','7122.BB.SS':'Square Section Offset Pull Handle SS','5327':'Round Cavity Suite Privacy','10405.SS':'Panic Bolt 300mm SS','10406.SS':'Offset Panic Bolt 450mm SS','10407.SS':'Panic Bolt 600mm SS','11530.SS':'Strike Shield Plate SS'};
-ZC['ALL']=Object.values(ZC).flat();
-function getCOpts(cat){return(ZC[cat]||ZC['ALL']).map(k=>`<option value="${k}">${k} — ${ZD[k]||''}</option>`).join('');}
-
-function badge(r){
-  if(r.nm)return`<span class="badge bn2">notes-driven</span>`;
-  const m={confirmed:'bc',suggested:'bs',unresolved:'bu',by_others:'bb',user:'buser'};
-  const l={confirmed:'confirmed',suggested:'ai suggestion',unresolved:'unresolved',by_others:'by others',user:'user selected'};
-  return`<span class="badge ${m[r.matchType]||'bu'}">${l[r.matchType]||r.matchType}</span>`;
-}
-function render(res,notes){
-  const area=document.getElementById('results');
-  const conf=res.filter(r=>r.matchType==='confirmed'&&!r.nm).length;
-  const nd=res.filter(r=>r.nm).length;
-  const sug=res.filter(r=>r.matchType==='suggested'&&!r.nm).length;
-  const unr=res.filter(r=>r.matchType==='unresolved'||r.matchType==='by_others').length;
-  let h=`<div class="scards"><div class="sc"><div class="sn">${res.length}</div><div class="sl">Total lines</div></div><div class="sc"><div class="sn" style="color:var(--green)">${conf}</div><div class="sl">Confirmed</div></div><div class="sc"><div class="sn" style="color:var(--gold3)">${nd}</div><div class="sl">Notes-driven</div></div><div class="sc"><div class="sn" style="color:var(--blue)">${sug}</div><div class="sl">AI suggestions</div></div><div class="sc"><div class="sn" style="color:var(--amber)">${unr}</div><div class="sl">Needs review</div></div></div>`;
-  if(notes)h+=`<div class="nbanner"><strong>Project notes applied</strong>${esc(notes)}</div>`;
-  h+=`<div class="tw"><table><thead><tr><th style="width:110px">Competitor code</th><th style="width:145px">Competitor description</th><th style="width:65px">Door/ref</th><th style="width:36px;text-align:right">Qty</th><th style="width:155px">Zanda code</th><th style="width:165px">Zanda description</th><th style="width:115px">Match type</th><th>Notes</th></tr></thead><tbody>`;
-  res.forEach((r,idx)=>{
-    const isU=r.matchType==='unresolved';
-    const zc=isU?`<select onchange="pick(${idx},this.value)"><option value="">— select —</option>${getCOpts(r.cat||'ALL')}</select>`:`<span class="mono">${esc(r.zandaCode)}</span>`;
-    h+=`<tr class="${r.nm?'nm':''}"><td><span class="mono">${esc(r.compCode)}</span></td><td class="muted">${esc(r.compDesc||'')}</td><td class="muted">${esc(r.door||'')}</td><td style="text-align:right;font-weight:700">${r.qty}</td><td>${zc}</td><td class="muted">${esc(r.zandaDesc||'')}</td><td>${badge(r)}</td><td><span class="muted it">${esc(r.notes||'')}</span></td></tr>`;
+  catch(e){air=items.map(()=>({zandaCode:'UNRESOLVED',zandaDesc:'',matchType:'unresolved',notes:'parse error',nm:false,cat:'ALL',finishNote:''}));}
+  return items.map((item,i)=>{
+    const a=air[i]||{zandaCode:'UNRESOLVED',zandaDesc:'',matchType:'unresolved',notes:'',nm:false,cat:'ALL',finishNote:''};
+    let zc=a.zandaCode||'UNRESOLVED',zd=a.zandaDesc||'',mt=a.matchType||'unresolved';
+    const isRaven=zc.startsWith('A8SIC')||zc.startsWith('A120')||zc.startsWith('RP');
+    if(zc&&zc!=='UNRESOLVED'&&zc!==''&&!isRaven){
+      if(catCodes&&Object.keys(catCodes).length>0&&!catCodes[zc]){
+        console.warn('Blackbeard: rejected "'+zc+'" for '+item.code);
+        zc='UNRESOLVED';zd='';mt='unresolved';
+        a.notes=(a.notes?a.notes+' \u00b7 ':'')+'Code not in Zanda catalogue';
+      }else if(catCodes&&catCodes[zc]&&!zd){zd=catCodes[zc].desc;}
+    }
+    const notesFull=[a.notes,a.finishNote].filter(Boolean).join(' \u00b7 ');
+    return{compCode:item.code,compDesc:item.description||'',qty:item.qty,door:item.door||'',zandaCode:zc,zandaDesc:zd,matchType:mt,notes:notesFull,nm:!!a.nm,cat:a.cat||'ALL',confirmedBy:'',staked:false};
   });
-  h+=`</tbody></table></div>`;
-  if(flags.length){h+=`<div class="fbox"><div class="fh">Flags — by others / needs attention</div>`;flags.forEach(f=>{h+=`<div class="fi"><span class="fico">⚑</span><span><strong>${esc(f.code)}</strong> — ${esc(f.reason)}</span></div>`;});h+=`</div>`;}
-  h+=`<div class="dlrow"><button class="btn btn-p" onclick="dlPM()">↓ Promaster CSV</button><button class="btn btn-g" onclick="dlBC()">↓ BC Quote CSV</button></div>`;
-  area.innerHTML=h;
 }
-async function pick(idx,code){
-  if(!code)return;
-  results[idx].zandaCode=code;results[idx].zandaDesc=ZD[code]||code;results[idx].matchType='user';results[idx].nm=false;
-  await storeSub(results[idx]);logUse('confirm_sub',null,null);
-  render(results,document.getElementById('ntxt').value.trim());
+function render(res,notes,pf,pl){
+  const area=document.getElementById('results');
+  const staked=res.filter(r=>r.staked).length;
+  const confirmed=res.filter(r=>r.matchType==='confirmed'&&!r.staked).length;
+  const sug=res.filter(r=>r.matchType==='suggested'&&!r.nm&&!r.staked).length;
+  const nd=res.filter(r=>r.nm).length;
+  const unr=res.filter(r=>(r.matchType==='unresolved'||r.matchType==='by_others')&&!r.staked).length;
+  const readyTotal=confirmed+nd+sug+staked;
+  let html='<div class="scards"><div class="sc"><div class="sn">'+res.length+'</div><div class="sl">Total lines</div></div><div class="sc sc-wow"><div class="sn">'+readyTotal+'</div><div class="sl">Ready to go \u2713</div></div><div class="sc '+(unr>0?'sc-review':'sc-wow')+'"><div class="sn">'+unr+'</div><div class="sl">'+(unr===0?'All matched \uD83C\uDF89':'Need your eyes')+'</div></div><div class="sc"><div class="sn" style="color:var(--blue)">'+sug+'</div><div class="sl">AI suggestions</div></div><div class="sc"><div class="sn" style="color:var(--green)">'+staked+'</div><div class="sl">Confirmed \u2713</div></div></div>';
+  if(pf||pl)html+='<div class="nbanner"><strong>Project defaults applied</strong>'+(pf?'Preferred finish: '+pf:'')+(pf&&pl?' \u00b7 ':'')+(pl?'Preferred lever: '+pl:'')+'</div>';
+  if(notes)html+='<div class="nbanner"><strong>Project brief applied</strong>'+esc(notes)+'</div>';
+  html+='<div class="tw"><table><thead><tr><th style="width:105px">Competitor code</th><th style="width:145px">Description</th><th style="width:58px">Door</th><th style="width:34px;text-align:right">Qty</th><th style="width:205px">Zanda code</th><th style="width:155px">Zanda description</th><th style="width:105px">Status</th><th>Notes</th></tr></thead><tbody>';
+  res.forEach(function(r,idx){
+    const rowCls=r.staked?'confirmed-row':r.nm?'nm-row':'';
+    const isBO=r.matchType==='by_others';
+    const compCell='<span class="mono" onclick="showBrief(\''+esc(r.compCode)+'\',\''+esc(r.compDesc||'')+'\''+')" title="Click for product brief">'+esc(r.compCode)+'</span>';
+    let zandaCell,confirmArea='';
+    if(isBO){
+      zandaCell='<span class="muted it" style="font-size:10px">By others</span>';
+    }else{
+      const code=r.zandaCode&&r.zandaCode!=='UNRESOLVED'?r.zandaCode:'';
+      zandaCell='<div class="ta-wrap"><input class="ta-input" id="tai-'+idx+'" value="'+esc(code)+'" placeholder="Search catalogue\u2026" oninput="taSearch('+idx+',this.value)" onfocus="taFocus('+idx+')" onkeydown="taKey(event,'+idx+')" autocomplete="off"><div class="ta-drop" id="tad-'+idx+'" style="display:none"></div></div>';
+      if(r.staked){
+        confirmArea='<div class="confirm-btn staked">\u2713 Confirmed</div><div class="conf-meta">'+esc(r.confirmedBy||'')+(r.confirmedAt?' \u00b7 '+r.confirmedAt:'')+'</div>';
+      }else if(code){
+        confirmArea='<button class="confirm-btn" id="cfbtn-'+idx+'" onclick="stakeNeck('+idx+')">\uD83D\uDC4D I\'ll stake my neck on this</button>';
+      }
+    }
+    html+='<tr class="'+rowCls+'"><td>'+compCell+'</td><td class="muted">'+esc(r.compDesc||'')+'</td><td class="muted">'+esc(r.door||'')+'</td><td style="text-align:right;font-weight:700">'+r.qty+'</td><td class="zanda-cell">'+zandaCell+confirmArea+'</td><td class="muted" id="zdesc-'+idx+'">'+esc(r.zandaDesc||'')+'</td><td>'+badge(r)+'</td><td><span class="muted it">'+esc(r.notes||'')+'</span></td></tr>';
+  });
+  html+='</tbody></table></div>';
+  if(flags.length){html+='<div class="fbox"><div class="fh">By others / needs attention</div>';flags.forEach(f=>{html+='<div class="fi"><span class="fico">\u2691</span><span><strong>'+esc(f.code)+'</strong> \u2014 '+esc(f.reason)+'</span></div>';});html+='</div>';}
+  html+='<div class="dlrow"><button class="btn btn-p" onclick="dlFull()">\u2193 Full BOQ (Excel)</button><button class="btn btn-g" onclick="dlPM()">\u2193 Promaster CSV</button><button class="btn" onclick="dlBC()">\u2193 BC Quote CSV</button></div>';
+  area.innerHTML=html;
+}
+function badge(r){
+  if(r.staked)return'<span class="badge bstaked">confirmed \u2713</span>';
+  if(r.nm)return'<span class="badge bn2">notes-driven</span>';
+  const m={confirmed:'bc',suggested:'bs',unresolved:'bu',by_others:'bb',user:'buser'};
+  const l={confirmed:'confirmed',suggested:'best match',unresolved:'needs review',by_others:'by others',user:'user selected'};
+  return'<span class="badge '+(m[r.matchType]||'bu')+'">'+(l[r.matchType]||r.matchType)+'</span>';
+}
+const taTimers={},taSelIdx={};
+async function taFocus(idx){const input=document.getElementById('tai-'+idx);if(input)taSearch(idx,input.value);}
+async function taSearch(idx,query){
+  clearTimeout(taTimers[idx]);
+  const drop=document.getElementById('tad-'+idx);if(!drop)return;
+  if(!query||query.length<2){drop.style.display='none';return;}
+  taTimers[idx]=setTimeout(async function(){
+    const cat=await getCatCodes().catch(()=>({}));
+    const q=query.toLowerCase();
+    const matches=Object.entries(cat).filter(function([code,v]){return code.toLowerCase().includes(q)||v.desc.toLowerCase().includes(q);}).slice(0,20);
+    if(!matches.length){drop.style.display='none';return;}
+    drop.innerHTML=matches.map(function([code,v],i){return'<div class="ta-opt" onclick="taSelect('+idx+',\''+esc(code)+'\',\''+esc(v.desc)+'\')" onmouseenter="taSelIdx['+idx+']='+i+'"><span class="ta-code">'+esc(code)+'</span><span class="ta-desc">'+esc(v.desc)+'</span></div>';}).join('');
+    drop.style.display='block';taSelIdx[idx]=0;
+    const first=drop.querySelector('.ta-opt');if(first)first.classList.add('sel');
+  },180);
+}
+function taKey(e,idx){
+  const drop=document.getElementById('tad-'+idx);if(!drop||drop.style.display==='none')return;
+  const opts=drop.querySelectorAll('.ta-opt');if(!opts.length)return;
+  if(e.key==='ArrowDown'){e.preventDefault();taSelIdx[idx]=Math.min((taSelIdx[idx]||0)+1,opts.length-1);}
+  else if(e.key==='ArrowUp'){e.preventDefault();taSelIdx[idx]=Math.max((taSelIdx[idx]||0)-1,0);}
+  else if(e.key==='Enter'){e.preventDefault();const s=opts[taSelIdx[idx]||0];if(s)s.click();return;}
+  else if(e.key==='Escape'){drop.style.display='none';return;}
+  opts.forEach(function(o,i){o.classList.toggle('sel',i===taSelIdx[idx]);});
+}
+function taSelect(idx,code,desc){
+  const input=document.getElementById('tai-'+idx),drop=document.getElementById('tad-'+idx);
+  if(input)input.value=code;if(drop)drop.style.display='none';
+  if(!results[idx])return;
+  results[idx].zandaCode=code;results[idx].zandaDesc=desc;results[idx].matchType='user';results[idx].staked=false;
+  const descEl=document.getElementById('zdesc-'+idx);if(descEl)descEl.textContent=desc;
+  const cell=input&&input.closest('.zanda-cell');if(!cell)return;
+  const existing=cell.querySelector('.confirm-btn');if(existing)existing.remove();
+  const meta=cell.querySelector('.conf-meta');if(meta)meta.remove();
+  if(code){cell.insertAdjacentHTML('beforeend','<button class="confirm-btn" id="cfbtn-'+idx+'" onclick="stakeNeck('+idx+')">\uD83D\uDC4D I\'ll stake my neck on this</button>');}
+  const tr=input&&input.closest('tr');if(tr){const bc=tr.cells[6];if(bc)bc.innerHTML=badge(results[idx]);}
+}
+document.addEventListener('click',function(e){if(!e.target.closest('.ta-wrap')&&!e.target.closest('.amf-zdrop'))document.querySelectorAll('.ta-drop').forEach(function(d){d.style.display='none';});});
+async function stakeNeck(idx){
+  const r=results[idx];if(!r||!r.zandaCode||r.zandaCode==='UNRESOLVED')return;
+  const un=uname();const now=new Date();const ds=now.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'2-digit'});
+  r.staked=true;r.confirmedBy=un;r.matchType='confirmed';r.confirmedAt=ds;
+  await storeSub(r);logUse('confirm_sub',null,null);
+  const btn=document.getElementById('cfbtn-'+idx);
+  if(btn){btn.className='confirm-btn staked';btn.textContent='\u2713 Confirmed';btn.onclick=null;btn.insertAdjacentHTML('afterend','<div class="conf-meta">'+esc(un)+' \u00b7 '+ds+'</div>');}
+  const tr=document.getElementById('tai-'+idx)&&document.getElementById('tai-'+idx).closest('tr');
+  if(tr){tr.className='confirmed-row';const bc=tr.cells[6];if(bc)bc.innerHTML=badge(r);}
+  const staked=results.filter(function(r){return r.staked;}).length;
+  const cards=document.querySelectorAll('.sc .sn');if(cards[4])cards[4].textContent=staked;
+}
+const _briefCache={};
+async function showBrief(code,desc){
+  document.getElementById('briefTitle').textContent=code;
+  document.getElementById('briefModal').classList.add('open');
+  const bodyEl=document.getElementById('briefBody');
+  if(_briefCache[code]){bodyEl.innerHTML=_briefCache[code];return;}
+  bodyEl.innerHTML='<div class="brief-spin"><div class="spin"></div>Looking up product\u2026</div>';
+  try{
+    const norm=code.toUpperCase().replace(/[\s\/\-\*\.]/g,'');
+    const [a,b]=await Promise.all([
+      sb.from('substitutions').select('zanda_code,zanda_description,confirmed_by_name,confidence').eq('competitor_code_norm',norm),
+      sb.from('training_mappings').select('zanda_code,zanda_description,confirmed_by_name').eq('competitor_code',code)
+    ]);
+    const allSubs=[...(a.data||[]),...(b.data||[])];
+    const brief=await ai('You are a door hardware expert. Give concise, factual product descriptions for door hardware professionals. Be direct and technical.','Competitor product code: '+code+'\nDescription hint: '+(desc||'none provided')+'\n\nProvide a 2-3 sentence description of what this product is, what it does, and typical applications. If you do not know this exact product, describe the product type based on the code structure. Be factual. No marketing language.',400).catch(()=>'Unable to load product brief.');
+    const googleQ=encodeURIComponent(code+' '+(desc||'')+' door hardware Australia');
+    let html='<div class="brief-code">'+esc(code)+'</div><div class="brief-desc">'+esc(brief)+'</div>';
+    html+='<a class="brief-img-link" href="https://www.google.com/search?q='+googleQ+'&tbm=isch" target="_blank" rel="noopener">\uD83D\uDD0D &nbsp;Search Google Images \u2192</a>';
+    html+='<div class="brief-known"><div class="brief-known-title">'+(allSubs.length?'Known Zanda equivalents':'No confirmed equivalents yet')+'</div>';
+    if(allSubs.length){allSubs.forEach(function(s){html+='<div class="brief-sub"><span class="brief-sub-code">'+esc(s.zanda_code)+'</span><span style="color:var(--muted);font-size:10px;margin-left:6px">'+esc(s.zanda_description||'')+'</span><span class="brief-sub-by">'+(s.confirmed_by_name?'\u2713 '+esc(s.confirmed_by_name):'')+'</span></div>';});}
+    else{html+='<div style="font-size:11px;color:var(--muted)">Select a Zanda code and click \u201cI\'ll stake my neck\u201d to confirm the first equivalent.</div>';}
+    html+='</div>';
+    _briefCache[code]=html;bodyEl.innerHTML=html;
+  }catch(e){bodyEl.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px">'+esc(e.message||'Unable to load.')+'</div>';}
+}
+function closeBrief(e){if(e.target===document.getElementById('briefModal'))closeBriefDirect();}
+function closeBriefDirect(){document.getElementById('briefModal').classList.remove('open');}
+function dlFull(){
+  const ws=[['Code','Description','Supplier','Finish','Qty','Status','Notes']];
+  results.forEach(function(r){
+    if(r.matchType==='by_others'){ws.push(['',r.compDesc||r.compCode,'By Others','',r.qty,'By Others',r.notes||'']);}
+    else if(r.zandaCode&&r.zandaCode!=='UNRESOLVED'){const fin=r.zandaCode.includes('.')?r.zandaCode.split('.').pop():'';const brand=r.zandaCode.startsWith('A8SIC')||r.zandaCode.startsWith('A120')||r.zandaCode.startsWith('RP')?'Raven':'Zanda';ws.push([r.zandaCode,r.zandaDesc||'',brand,fin,r.qty,r.staked?'Confirmed':r.matchType,r.notes||'']);}
+    else{ws.push(['UNRESOLVED',r.compDesc||r.compCode,'\u2014','',r.qty,'Needs review',r.notes||'']);}
+  });
+  const wb=XLSX.utils.book_new();const sheet=XLSX.utils.aoa_to_sheet(ws);
+  sheet['!cols']=[{wch:20},{wch:42},{wch:10},{wch:8},{wch:6},{wch:14},{wch:32}];
+  XLSX.utils.book_append_sheet(wb,'BOQ',sheet);XLSX.writeFile(wb,'blackbeard_boq.xlsx');
+  logUse('download_boq',results.length,null);
 }
 function dlPM(){
   const rows=[['PartCode','Description','BrandName','FinishShort','ProductQuantity']];
-  results.filter(r=>r.zandaCode&&r.zandaCode!=='UNRESOLVED').forEach(r=>{
-    const fin=r.zandaCode.includes('.')?r.zandaCode.split('.').pop():'';
-    const brand=r.zandaCode.startsWith('A8SIC')||r.zandaCode.startsWith('A120')?'Raven':'Zanda';
-    rows.push([r.zandaCode,r.zandaDesc||'',brand,fin,r.qty]);
-  });
+  results.filter(function(r){return r.zandaCode&&r.zandaCode!=='UNRESOLVED'&&r.matchType!=='by_others';}).forEach(function(r){const fin=r.zandaCode.includes('.')?r.zandaCode.split('.').pop():'';const brand=r.zandaCode.startsWith('A8SIC')||r.zandaCode.startsWith('A120')||r.zandaCode.startsWith('RP')?'Raven':'Zanda';rows.push([r.zandaCode,r.zandaDesc||'',brand,fin,r.qty]);});
   logUse('download_promaster',results.length,null);dlCSV(rows,'blackbeard_promaster.csv');
 }
 function dlBC(){
   const rows=[['No.','Quantity']];
-  results.filter(r=>r.zandaCode&&r.zandaCode!=='UNRESOLVED').forEach(r=>rows.push([r.zandaCode,r.qty]));
+  results.filter(function(r){return r.zandaCode&&r.zandaCode!=='UNRESOLVED'&&r.matchType!=='by_others';}).forEach(function(r){rows.push([r.zandaCode,r.qty]);});
   logUse('download_bc',results.length,null);dlCSV(rows,'blackbeard_bc_quote.csv');
 }
-function dlCSV(rows,fn){
-  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=fn;a.click();
+function dlCSV(rows,fn){const csv=rows.map(function(r){return r.map(function(v){return'"'+String(v).replace(/"/g,'""')+'"';}).join(',');}).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=fn;a.click();}
+async function loadHist(){
+  const {data}=await sb.from('projects').select('id,project_name,competitor_brand,line_count,uploaded_at').order('uploaded_at',{ascending:false}).limit(10);
+  const list=document.getElementById('hlist');
+  if(!data||!data.length){list.innerHTML='<div style="padding:10px 14px;font-size:11px;color:var(--muted)">No past schedules yet.</div>';return;}
+  list.innerHTML=data.map(function(p){return'<div class="hitem" onclick="loadProject(\''+p.id+'\')"><span class="hdate">'+new Date(p.uploaded_at).toLocaleDateString('en-AU',{day:'numeric',month:'short'})+'</span><span class="hname">'+esc(p.project_name||'Untitled')+'</span><span class="hmeta">'+(p.competitor_brand||'')+' \u00b7 '+(p.line_count||0)+' lines</span></div>';}).join('');
+}
+async function loadHistFull(){
+  const {data}=await sb.from('projects').select('id,project_name,competitor_brand,line_count,uploaded_at,preferred_finish,preferred_lever').order('uploaded_at',{ascending:false}).limit(50);
+  const el=document.getElementById('histFull');
+  if(!data||!data.length){el.innerHTML='<p style="padding:1rem;color:var(--muted)">No schedules yet.</p>';return;}
+  el.innerHTML='<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:var(--light)">'+['Date','Project','Brand','Lines','Finish','Lever',''].map(function(h){return'<th style="padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)">'+h+'</th>';}).join('')+'</tr></thead><tbody>'+data.map(function(p){return'<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px;font-size:11px;color:var(--muted)">'+new Date(p.uploaded_at).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'2-digit'})+'</td><td style="padding:8px 12px;font-weight:600">'+esc(p.project_name||'Untitled')+'</td><td style="padding:8px 12px;font-size:11px;color:var(--muted)">'+(p.competitor_brand||'\u2014')+'</td><td style="padding:8px 12px;font-weight:600">'+(p.line_count||0)+'</td><td style="padding:8px 12px;font-size:11px">'+(p.preferred_finish||'\u2014')+'</td><td style="padding:8px 12px;font-size:11px">'+(p.preferred_lever||'\u2014')+'</td><td style="padding:8px 12px"><button class="btn btn-sm" onclick="loadProject(\''+p.id+'\');showPage(\'schedule\')">Load</button></td></tr>';}).join('')+'</tbody></table>';
+}
+async function loadProject(id){
+  const {data}=await sb.from('project_lines').select('*').eq('project_id',id);if(!data)return;
+  results=data.map(function(r){return{compCode:r.competitor_code,compDesc:r.competitor_description||'',qty:r.qty,door:r.door_ref||'',zandaCode:r.zanda_code||'',zandaDesc:r.zanda_description||'',matchType:r.match_type||'suggested',notes:r.notes||'',nm:r.notes_driven||false,confirmedBy:'',staked:r.match_type==='confirmed'};});
+  togHist();render(results,'','','');
+}
+function togHist(){const l=document.getElementById('hlist'),a=document.getElementById('harr'),o=l.style.display==='block';l.style.display=o?'none':'block';a.textContent=o?'\u25BC':'\u25B2';}
+async function loadLB(){
+  const {data}=await sb.from('usage_log').select('user_name,user_email,action').eq('action','process_schedule');
+  const el=document.getElementById('lbContent');
+  if(!data||!data.length){el.innerHTML='<p style="padding:1rem;color:var(--muted)">No activity yet.</p>';return;}
+  const counts={};data.forEach(function(r){const n=r.user_name||r.user_email||'Unknown';counts[n]=(counts[n]||0)+1;});
+  const sorted=Object.entries(counts).sort(function(a,b){return b[1]-a[1];});const max=sorted[0]?.[1]||1;const medals=['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'];
+  el.innerHTML='<table class="lbt"><thead><tr><th>#</th><th>User</th><th>Schedules</th><th></th></tr></thead><tbody>'+sorted.map(function([name,count],i){return'<tr><td style="font-weight:700;width:30px">'+(i<3?medals[i]:(i+1))+'</td><td style="font-weight:600">'+esc(name)+'</td><td style="font-weight:700;color:var(--gold3)">'+count+'</td><td><div class="lbw"><div class="lbar" style="width:'+Math.round(count/max*100)+'%"></div></div></td></tr>';}).join('')+'</tbody></table>';
+}
+async function loadTraining(){
+  const {data}=await sb.from('training_mappings').select('*').order('competitor_brand').order('competitor_code');
+  _tmData=data||[];filterTM();
+  document.getElementById('tmCount').textContent=_tmData.length+' mappings';
+}
+function filterTM(){
+  const q=(document.getElementById('tmSearch')&&document.getElementById('tmSearch').value||'').toLowerCase();
+  const brand=document.getElementById('tmBrand')&&document.getElementById('tmBrand').value||'';
+  const filtered=_tmData.filter(function(r){
+    const mb=!brand||r.competitor_brand===brand;
+    const mq=!q||r.competitor_code.toLowerCase().includes(q)||(r.competitor_description||'').toLowerCase().includes(q)||(r.zanda_code||'').toLowerCase().includes(q);
+    return mb&&mq;
+  });
+  renderTM(filtered);
+}
+function renderTM(rows){
+  const tbody=document.getElementById('tmRows');
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="6" style="padding:24px;text-align:center;color:var(--muted);font-size:11px">No mappings found. Add some to build Blackbeard\'s knowledge base!</td></tr>';return;}
+  const grouped={};
+  rows.forEach(function(r){const key=r.competitor_brand+'||'+(r.competitor_code_base||r.competitor_code);if(!grouped[key])grouped[key]={brand:r.competitor_brand,code:r.competitor_code_base||r.competitor_code,desc:r.competitor_description,subs:[]};grouped[key].subs.push({zc:r.zanda_code,zd:r.zanda_description,by:r.confirmed_by_name,id:r.id,notes:r.notes});});
+  tbody.innerHTML=Object.values(grouped).map(function(g){return'<tr><td><span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--light);color:var(--navy);font-weight:600;white-space:nowrap">'+esc(g.brand)+'</span></td><td><span class="tm-code" onclick="showBrief(\''+esc(g.code)+'\',\''+esc(g.desc||'')+'\')">'+esc(g.code)+'</span></td><td class="muted">'+esc(g.desc||'')+'</td><td><div class="tm-subs">'+g.subs.map(function(s){return'<span class="tm-sub" title="'+esc(s.zd||'')+(s.notes?' \u00b7 '+s.notes:'')+'">'+esc(s.zc)+'<em class="tm-sub-del" onclick="deleteTMSub('+s.id+')" title="Remove">\u00d7</em></span>';}).join('')+'</div></td><td class="tm-by">'+([...new Set(g.subs.map(function(s){return s.by;}).filter(Boolean))].join(', ')||'\u2014')+'</td><td><button class="btn btn-sm" onclick="addSubToCode(\''+esc(g.brand)+'\',\''+esc(g.code)+'\',\''+esc(g.desc||'\'')+'\')" title="Add another Zanda equivalent">+</button></td></tr>';}).join('');
+}
+function toggleAddForm(){const f=document.getElementById('addMappingForm');f.classList.toggle('open');if(f.classList.contains('open'))document.getElementById('amCompCode')&&document.getElementById('amCompCode').focus();}
+async function amLookupComp(){
+  const code=document.getElementById('amCompCode').value.trim();if(!code)return;
+  const brand=document.getElementById('amBrand').value;
+  const {data}=await sb.from('competitor_catalogue').select('description').eq('brand',brand).ilike('code',code).single();
+  if(data&&data.description)document.getElementById('amCompDesc').value=data.description;
+}
+let _amZTimer=null;
+async function amZandaSearch(){
+  clearTimeout(_amZTimer);
+  const q=document.getElementById('amZandaCode').value;
+  const drop=document.getElementById('amZandaDrop');
+  if(!q||q.length<2){drop.style.display='none';return;}
+  _amZTimer=setTimeout(async function(){
+    const cat=await getCatCodes().catch(()=>({}));
+    const ql=q.toLowerCase();
+    const matches=Object.entries(cat).filter(function([c,v]){return c.toLowerCase().includes(ql)||v.desc.toLowerCase().includes(ql);}).slice(0,10);
+    if(!matches.length){drop.style.display='none';return;}
+    drop.innerHTML=matches.map(function([code,v]){return'<div class="ta-opt" onclick="amPickZanda(\''+esc(code)+'\',\''+esc(v.desc)+'\')" style="cursor:pointer"><span class="ta-code">'+esc(code)+'</span><span class="ta-desc">'+esc(v.desc)+'</span></div>';}).join('');
+    drop.style.display='block';
+  },180);
+}
+function amPickZanda(code,desc){document.getElementById('amZandaCode').value=code;document.getElementById('amZandaDesc').value=desc;document.getElementById('amZandaDrop').style.display='none';}
+function addSubToCode(brand,code,desc){
+  document.getElementById('amBrand').value=brand;document.getElementById('amCompCode').value=code;document.getElementById('amCompDesc').value=desc;
+  const f=document.getElementById('addMappingForm');f.classList.add('open');
+  document.getElementById('amZandaCode').focus();f.scrollIntoView({behavior:'smooth'});
+}
+async function saveMapping(){
+  const brand=document.getElementById('amBrand').value;
+  const compCode=document.getElementById('amCompCode').value.trim();
+  const compDesc=document.getElementById('amCompDesc').value.trim();
+  const zandaCode=document.getElementById('amZandaCode').value.trim();
+  const zandaDesc=document.getElementById('amZandaDesc').value.trim();
+  const notes=document.getElementById('amNotes').value.trim();
+  const msg=document.getElementById('amMsg');
+  if(!compCode||!zandaCode){msg.textContent='Competitor code and Zanda code are required.';return;}
+  const un=uname();
+  const codeBase=compCode.replace(/\.(SS|BN|GN|SB|BLK|EB|SC|SNP|SIL|SE|WHT|CP|PSS|SCP)$/i,'');
+  const zBase=zandaCode.replace(/\.(SS|BN|GN|SB|BLK|EB|SC|SNP|SIL|SE|WHT|CP|PSS|SCP)$/i,'');
+  msg.textContent='Saving\u2026';
+  const {error}=await sb.from('training_mappings').upsert({competitor_brand:brand,competitor_code:compCode,competitor_code_base:codeBase,competitor_description:compDesc||null,zanda_code:zandaCode,zanda_code_base:zBase,zanda_description:zandaDesc||null,confirmed_by_name:un,confirmed_by_email:user&&user.email,confidence:'training_confirmed',notes:notes||null,updated_at:new Date().toISOString()},{onConflict:'competitor_brand,competitor_code_base,zanda_code_base'});
+  if(error){msg.textContent='Error: '+error.message;return;}
+  await sb.from('substitutions').upsert({competitor_code:compCode,competitor_code_norm:compCode.toUpperCase().replace(/[\s\/\-\*\.]/g,''),competitor_description:compDesc||null,zanda_code:zandaCode,zanda_description:zandaDesc||null,source:'training_confirmed',confidence:'training_confirmed',confirmed_by:user&&user.id,confirmed_by_name:un,confirmed_by_email:user&&user.email,confirmed_at:new Date().toISOString()},{onConflict:'competitor_code_norm'});
+  msg.textContent='\u2713 Saved!';
+  ['amCompCode','amCompDesc','amZandaCode','amZandaDesc','amNotes'].forEach(function(id){const el=document.getElementById(id);if(el)el.value='';});
+  setTimeout(function(){msg.textContent='';},2500);
+  await loadTraining();
+}
+async function deleteTMSub(id){
+  if(!confirm('Remove this mapping?'))return;
+  await sb.from('training_mappings').delete().eq('id',id);
+  await loadTraining();
 }
 init();
 </script>
