@@ -873,5 +873,185 @@ async function deleteTMSub(id){
 }
 init();
 </script>
+  <!-- ZIG ASSISTANT -->
+<style>
+#zig-bubble{position:fixed;bottom:28px;right:28px;z-index:9999;font-family:var(--font-sans,system-ui,sans-serif)}
+#zig-toggle{width:52px;height:52px;border-radius:50%;background:#fff;border:1.5px solid rgba(0,0,0,0.15);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,0.12);transition:transform 0.15s;margin-left:auto}
+#zig-toggle:hover{transform:scale(1.06)}
+#zig-panel{position:absolute;bottom:64px;right:0;width:380px;max-height:520px;background:#fff;border:0.5px solid rgba(0,0,0,0.12);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.10);animation:zigIn 0.18s ease}
+@keyframes zigIn{from{opacity:0;transform:translateY(8px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+#zig-header{padding:12px 16px;border-bottom:0.5px solid rgba(0,0,0,0.08);display:flex;align-items:center;gap:10px}
+.zig-avatar{width:30px;height:30px;border-radius:50%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff;flex-shrink:0}
+.zig-name{font-size:14px;font-weight:500;color:#111}
+.zig-status-txt{font-size:11px;color:#888;margin-top:1px}
+.zig-close{margin-left:auto;background:none;border:none;cursor:pointer;color:#888;padding:4px;border-radius:6px;display:flex;align-items:center}
+.zig-close:hover{background:#f5f5f5}
+#zig-messages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:180px;max-height:320px}
+.zig-msg{display:flex;flex-direction:column;gap:4px;max-width:88%}
+.zig-msg.user{align-self:flex-end;align-items:flex-end}
+.zig-msg.zig{align-self:flex-start;align-items:flex-start}
+.zig-bubble-msg{padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.5}
+.zig-msg.user .zig-bubble-msg{background:#1a1a1a;color:#fff;border-bottom-right-radius:4px}
+.zig-msg.zig .zig-bubble-msg{background:#f5f5f5;color:#111;border-bottom-left-radius:4px;border:0.5px solid rgba(0,0,0,0.08)}
+.zig-undo-bar{display:flex;align-items:center;gap:8px;padding:6px 10px;background:#f5f5f5;border-radius:8px;font-size:12px;color:#666;border:0.5px solid rgba(0,0,0,0.08);margin-top:4px}
+.zig-undo-btn{margin-left:auto;background:none;border:0.5px solid rgba(0,0,0,0.2);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:#111;font-family:inherit}
+.zig-undo-btn:hover{background:#fff}
+#zig-suggestions{padding:0 14px 10px;display:flex;flex-wrap:wrap;gap:6px}
+.zig-chip{background:#f5f5f5;border:0.5px solid rgba(0,0,0,0.1);border-radius:20px;padding:4px 11px;font-size:11px;color:#555;cursor:pointer;font-family:inherit}
+.zig-chip:hover{border-color:rgba(0,0,0,0.3);color:#111}
+#zig-input-area{padding:10px 14px 14px;border-top:0.5px solid rgba(0,0,0,0.08);display:flex;gap:8px;align-items:flex-end}
+#zig-input{flex:1;resize:none;border:0.5px solid rgba(0,0,0,0.2);border-radius:10px;padding:8px 12px;font-size:13px;font-family:inherit;background:#fff;color:#111;outline:none;line-height:1.4;min-height:36px;max-height:80px}
+#zig-input:focus{border-color:rgba(0,0,0,0.4)}
+#zig-send{width:34px;height:34px;background:#1a1a1a;border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity 0.15s}
+#zig-send:hover{opacity:0.8}
+#zig-send:disabled{opacity:0.35;cursor:default}
+.zig-dot{width:6px;height:6px;border-radius:50%;background:#999;animation:zigDot 1.2s infinite;display:inline-block;margin:2px}
+.zig-dot:nth-child(2){animation-delay:0.2s}
+.zig-dot:nth-child(3){animation-delay:0.4s}
+@keyframes zigDot{0%,80%,100%{opacity:0.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
+</style>
+
+<div id="zig-bubble">
+  <div id="zig-panel" style="display:none;">
+    <div id="zig-header">
+      <div class="zig-avatar">ZIG</div>
+      <div><div class="zig-name">Zig</div><div class="zig-status-txt" id="zig-status-txt">Schedule assistant</div></div>
+      <button class="zig-close" onclick="zigToggle()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+    </div>
+    <div id="zig-messages"></div>
+    <div id="zig-suggestions">
+      <button class="zig-chip" onclick="zigChip('All seals → Raven')">All seals → Raven</button>
+      <button class="zig-chip" onclick="zigChip('Change all SS to BN')">All SS → BN</button>
+      <button class="zig-chip" onclick="zigChip('How many unresolved lines?')">Unresolved count</button>
+      <button class="zig-chip" onclick="zigChip('Mark all door closers as By Others')">Closers → By Others</button>
+    </div>
+    <div id="zig-input-area">
+      <textarea id="zig-input" rows="1" placeholder="Tell Zig what to change…" onkeydown="zigKey(event)" oninput="zigResize(this)"></textarea>
+      <button id="zig-send" onclick="zigSend()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.5"><path d="M2 8h12M8 2l6 6-6 6"/></svg></button>
+    </div>
+  </div>
+  <div style="position:relative;"><button id="zig-toggle" onclick="zigToggle()" title="Zig — schedule assistant"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></button></div>
+</div>
+
+<script>
+(function(){
+  const PROXY='https://ebgykbxxruftohpgifbe.supabase.co/functions/v1/ai-proxy';
+  const SB='https://ebgykbxxruftohpgifbe.supabase.co';
+  const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImViZ3lrYnh4cnVmdG9ocGdpZmJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NjMyNTMsImV4cCI6MjA5MTMzOTI1M30.vqeglKXgYA6cVyLvKx8eQQtsp_rfGfUaoj0zLlaJUno';
+  const HDR={'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+KEY};
+  let open=false,busy=false;
+
+  window.zigToggle=function(){
+    open=!open;
+    document.getElementById('zig-panel').style.display=open?'flex':'none';
+    if(open&&!document.getElementById('zig-messages').children.length)
+      zigMsg("Hey — I'm Zig. Tell me what to change on this schedule and I'll get it done. Everything's undoable.");
+    if(open)setTimeout(()=>document.getElementById('zig-input').focus(),80);
+  };
+  window.zigChip=function(t){document.getElementById('zig-input').value=t;zigSend();};
+  window.zigKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();zigSend();}};
+  window.zigResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,80)+'px';};
+
+  function zigMsg(html,extra){
+    const w=document.getElementById('zig-messages');
+    const d=document.createElement('div');d.className='zig-msg zig';
+    d.innerHTML='<div class="zig-bubble-msg">'+html+'</div>';
+    if(extra)d.appendChild(extra);
+    w.appendChild(d);w.scrollTop=w.scrollHeight;return d;
+  }
+  function userMsg(t){
+    const w=document.getElementById('zig-messages');
+    const d=document.createElement('div');d.className='zig-msg user';
+    d.innerHTML='<div class="zig-bubble-msg">'+t.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</div>';
+    w.appendChild(d);w.scrollTop=w.scrollHeight;
+  }
+  function thinking(){
+    const w=document.getElementById('zig-messages');
+    const d=document.createElement('div');d.className='zig-msg zig';d.id='zig-think';
+    d.innerHTML='<div class="zig-bubble-msg"><span class="zig-dot"></span><span class="zig-dot"></span><span class="zig-dot"></span></div>';
+    w.appendChild(d);w.scrollTop=w.scrollHeight;
+  }
+  function unthink(){const e=document.getElementById('zig-think');if(e)e.remove();}
+  function status(t){document.getElementById('zig-status-txt').textContent=t;}
+
+  function undoBar(patch,label){
+    const bar=document.createElement('div');bar.className='zig-undo-bar';
+    bar.innerHTML='<span>'+label+'</span>';
+    const btn=document.createElement('button');btn.className='zig-undo-btn';btn.textContent='Undo';
+    btn.onclick=async()=>{
+      btn.disabled=true;btn.textContent='…';
+      for(const c of patch){
+        await fetch(SB+'/rest/v1/project_lines?id=eq.'+c.id,{method:'PATCH',headers:{...HDR,'Prefer':'return=minimal'},body:JSON.stringify({[c.field]:c.old_value??null})});
+      }
+      bar.innerHTML='<span style="color:#999">Undone</span>';
+      zigMsg('Done — reversed.');
+      if(window.refreshProjectLines)window.refreshProjectLines();
+    };
+    bar.appendChild(btn);return bar;
+  }
+
+  async function getLines(){
+    const pid=window.currentProjectId;
+    if(!pid)return[];
+    const r=await fetch(SB+'/rest/v1/project_lines?project_id=eq.'+pid+'&select=id,competitor_code,competitor_description,zanda_code,zanda_description,qty,match_type,notes',{headers:HDR});
+    return r.ok?await r.json():[];
+  }
+
+  window.zigSend=async function(){
+    const inp=document.getElementById('zig-input');
+    const txt=inp.value.trim();
+    if(!txt||busy)return;
+    inp.value='';inp.style.height='auto';
+    document.getElementById('zig-send').disabled=true;
+    busy=true;userMsg(txt);thinking();status('Thinking…');
+
+    const lines=await getLines();
+    const sys=`You are Zig, a schedule assistant for Zanda Architectural Hardware. You help users bulk-edit project schedule lines.
+
+Each line has: id, competitor_code, competitor_description, zanda_code, zanda_description, qty, match_type, notes.
+
+Return ONLY a JSON object — no prose, no markdown fences.
+
+Format:
+{"summary":"what changed","read_only":false,"answer":null,"patch":[{"id":"<uuid>","field":"<field>","old_value":"<current>","new_value":"<new>"}]}
+
+If it's a question, set read_only:true, answer:"<answer>", patch:[].
+If nothing matches, patch:[] and explain in summary.
+
+Rules:
+- Seals → zanda_code:"RAVEN-AUTO", zanda_description:"Raven seal — select product", match_type:"raven_auto"
+- Finish swap: replace suffix in zanda_code (10001.SS → 10001.BN)
+- By Others: match_type:"by_others", zanda_code:null, zanda_description:null
+- Only modify: zanda_code, zanda_description, match_type, notes
+
+Lines (${lines.length} total):
+${JSON.stringify(lines.slice(0,80))}`;
+
+    try{
+      const r=await fetch(PROXY,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system:sys,messages:[{role:'user',content:txt}],max_tokens:2000})});
+      unthink();
+      if(!r.ok){const e=await r.json().catch(()=>({}));zigMsg('Error: '+(e.error||r.statusText));status('Schedule assistant');busy=false;document.getElementById('zig-send').disabled=false;return;}
+      const d=await r.json();
+      let raw=(d.text||'').trim().replace(/^```json\s*/i,'').replace(/```\s*$/,'');
+      let res;try{res=JSON.parse(raw);}catch{zigMsg("Couldn't parse that — try rephrasing.");status('Schedule assistant');busy=false;document.getElementById('zig-send').disabled=false;return;}
+      if(res.read_only){zigMsg(res.answer||res.summary);}
+      else if(!res.patch||!res.patch.length){zigMsg(res.summary||'No lines matched.');}
+      else{
+        status('Applying…');
+        let n=0;
+        for(const c of res.patch){
+          const ok=await fetch(SB+'/rest/v1/project_lines?id=eq.'+c.id,{method:'PATCH',headers:{...HDR,'Prefer':'return=minimal'},body:JSON.stringify({[c.field]:c.new_value})});
+          if(ok.ok)n++;
+        }
+        zigMsg(res.summary,undoBar(res.patch,n+' line'+(n!==1?'s':'')+' updated'));
+        if(window.refreshProjectLines)window.refreshProjectLines();
+      }
+    }catch(e){unthink();zigMsg('Error: '+e.message);}
+    status('Schedule assistant');busy=false;document.getElementById('zig-send').disabled=false;
+    document.getElementById('zig-input').focus();
+  };
+})();
+</script>
+<!-- END ZIG -->
 </body>
 </html>
